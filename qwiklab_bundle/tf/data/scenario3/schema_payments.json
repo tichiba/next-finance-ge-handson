@@ -1,0 +1,56 @@
+[
+  {
+    "name": "payment_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入金ID】主キー"
+  },
+  {
+    "name": "invoice_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：請求ID】外部キー（invoices.invoice_idと結合）"
+  },
+  {
+    "name": "customer_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約者ID】外部キー（customer_credit.customer_idと結合）"
+  },
+  {
+    "name": "payment_date",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：実入金日】実際の入金日（未収の場合は空文字）"
+  },
+  {
+    "name": "paid_amount_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入金済金額_円】入金済金額（円）"
+  },
+  {
+    "name": "unpaid_amount_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：未収残高_円】現在の期日超過・未収残高（円）"
+  },
+  {
+    "name": "payment_channel",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入金経路】口座自動引落、クレカ決済、コンビニ払込票・銀行振込、未入金 等"
+  },
+  {
+    "name": "reconciliation_status",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：消込ステータス】'期日内入金'、'遅延入金(督促後)'、'未収(期日超過)'"
+  },
+  {
+    "name": "delay_days",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：遅延日数】支払期日からの遅延日数（日）"
+  }
+]

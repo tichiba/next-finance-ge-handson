@@ -1,0 +1,50 @@
+[
+  {
+    "name": "survey_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：サーベイID】主キー"
+  },
+  {
+    "name": "survey_period",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：実施期】サーベイ実施期（2026_Q1, 2026_Q3）"
+  },
+  {
+    "name": "employee_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：社員ID】外部キー（employees.employee_idと結合）"
+  },
+  {
+    "name": "overall_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：総合スコア】エンゲージメント総合スコア（0〜100点）"
+  },
+  {
+    "name": "workload_satisfaction_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：業務量満足度】業務量・ワークライフバランス満足度スコア（0〜100点）"
+  },
+  {
+    "name": "manager_support_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：上司支援スコア】上司の支援・1on1満足度スコア（0〜100点）"
+  },
+  {
+    "name": "career_growth_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：成長実感スコア】キャリア成長実感スコア（0〜100点）"
+  },
+  {
+    "name": "performance_rating",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：人事評価ランク】直近人事評価ランク（S, A, B, C）"
+  }
+]

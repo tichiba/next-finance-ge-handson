@@ -1,0 +1,56 @@
+[
+  {
+    "name": "invoice_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：請求ID】主キー（payments.invoice_idと結合）"
+  },
+  {
+    "name": "customer_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約者ID】外部キー（customer_credit.customer_idと結合）"
+  },
+  {
+    "name": "billing_month",
+    "type": "DATE",
+    "mode": "NULLABLE",
+    "description": "【日本語名：請求月】請求対象年月（2026-04-01〜2026-09-01）"
+  },
+  {
+    "name": "subscriber_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約区分】'個人_回線契約者' または '法人_多回線一括請求'"
+  },
+  {
+    "name": "service_type",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：サービス種別】法人多回線一括請求(ビリングONE・光/IoT)、個人通信料＋電話料金合算 等"
+  },
+  {
+    "name": "billing_method",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：決済方式】口座振替、クレジットカード、払込票・請求書払い 等"
+  },
+  {
+    "name": "billed_amount_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：請求金額_円】月間請求金額（円）"
+  },
+  {
+    "name": "due_date",
+    "type": "DATE",
+    "mode": "NULLABLE",
+    "description": "【日本語名：支払期日】請求の支払期日"
+  },
+  {
+    "name": "payment_terms_days",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：支払サイト日数】標準支払サイト日数（原則30日）"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "lead_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：リードID】主キー（LEAD-30001〜LEAD-31200）"
+  },
+  {
+    "name": "campaign_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：施策ID】獲得元キャンペーンID（marketing_campaigns.campaign_idと結合）"
+  },
+  {
+    "name": "channel_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：チャネル種別】獲得チャネル種別（5分類）"
+  },
+  {
+    "name": "acquired_date",
+    "type": "DATE",
+    "mode": "NULLABLE",
+    "description": "【日本語名：獲得日】リード獲得日（2026-04-01〜2026-09-30）"
+  },
+  {
+    "name": "year_month",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：獲得年月】リード獲得年月（2026-04〜2026-09）"
+  },
+  {
+    "name": "company_segment",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：企業規模区分】顧客企業規模セグメント"
+  },
+  {
+    "name": "target_product",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：関心プロダクト】関心プロダクト・ソリューション名"
+  },
+  {
+    "name": "touchpoint_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：接点回数】インサイドセールス・Web接点回数（回）"
+  },
+  {
+    "name": "is_sql_qualified",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：有効商談化フラグ】1:営業商談化済み(SQL)、0:ナーチャリング中"
+  }
+]

@@ -1,0 +1,68 @@
+[
+  {
+    "name": "employee_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：社員ID】主キー（EMP-1001〜EMP-1300）"
+  },
+  {
+    "name": "employee_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：社員氏名】従業員氏名"
+  },
+  {
+    "name": "division_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：所属本部】所属本部名（5本部）"
+  },
+  {
+    "name": "department_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：所属部署】所属部署名"
+  },
+  {
+    "name": "job_role",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：職種】データ・AIエンジニア、クラウドアーキテクト、法人アカウント営業、債権・与信スペシャリスト 等"
+  },
+  {
+    "name": "grade",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：職能等級】G1_スタッフ〜G5_部長クラス"
+  },
+  {
+    "name": "annual_salary_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：理論年収_円】理論年収（円）"
+  },
+  {
+    "name": "avg_overtime_hours_6m",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：平均残業時間_月】直近6ヶ月平均残業時間（時間/月）"
+  },
+  {
+    "name": "engagement_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：エンゲージメントスコア】エンゲージメント総合スコア（0〜100点）"
+  },
+  {
+    "name": "turnover_risk_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：離職リスクスコア】AI離職リスクスコア（0〜100点：高スコアほど離職懸念大）"
+  },
+  {
+    "name": "turnover_risk_level",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：離職リスク区分】High_要ケア、Medium_注意、Low_安定"
+  }
+]

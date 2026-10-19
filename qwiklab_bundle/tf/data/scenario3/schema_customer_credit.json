@@ -1,0 +1,62 @@
+[
+  {
+    "name": "customer_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約者ID】主キー（CUST-xxxxは法人多回線一括請求契約者、INDV-xxxxxは個人回線契約者）"
+  },
+  {
+    "name": "customer_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約者名】取引先企業名または個人契約者名（例：東都ロジスティクス株式会社）"
+  },
+  {
+    "name": "subscriber_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約区分】'個人_回線契約者'（850件）または '法人_多回線一括請求'（150社）"
+  },
+  {
+    "name": "industry_or_segment",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：業種セグメント】法人の業種または個人の利用セグメント"
+  },
+  {
+    "name": "contracted_lines_count",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：契約回線数】光回線・モバイル・車載IoT回線等の合計契約回線数（回線）"
+  },
+  {
+    "name": "credit_rank",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：与信ランク】社内与信ランク（A:優良、B:標準、C1:要注意_遅延履歴あり、C2:警戒_督促・制限対象）"
+  },
+  {
+    "name": "credit_limit_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：与信限度額_円】月間与信限度額・電話料金合算利用上限額（円）"
+  },
+  {
+    "name": "overdue_status_flag",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：延滞ステータス】延滞管理ステータス（正常、要注意_遅延履歴あり、支払猶予相談中、督促中_合算枠制限対象 等）"
+  },
+  {
+    "name": "delayed_count_last_6m",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：直近6ヶ月遅延回数】直近6ヶ月以内の口座振替不能・入金遅延発生回数（2回以上は要注意先対象）"
+  },
+  {
+    "name": "assigned_department",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：管轄部署】管轄営業部・料金センター名"
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "call_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入電ID】主キー（CALL-10001〜CALL-11500）"
+  },
+  {
+    "name": "call_date",
+    "type": "DATE",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入電日】入電日付（2026-04-01〜2026-09-30）"
+  },
+  {
+    "name": "year_month",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入電年月】入電年月（2026-04〜2026-09）"
+  },
+  {
+    "name": "day_of_week",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：曜日】曜日（1_月曜〜7_日曜）"
+  },
+  {
+    "name": "hour_slot",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：時間帯】入電時間帯（09時台〜18時台）"
+  },
+  {
+    "name": "inquiry_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：問合せ大分類】請求・引落確認、支払期日・分割相談、WEB明細・ログイン操作、契約内容変更・解約、法人リース審査・増枠"
+  },
+  {
+    "name": "inquiry_sub_reason",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：問合せ詳細理由】問い合わせ詳細理由（ツリーマップ第2階層用）"
+  },
+  {
+    "name": "operator_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：オペレーターID】担当オペレーターID（operators.operator_idと結合、放棄呼はUNASSIGNED）"
+  },
+  {
+    "name": "wait_time_sec",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：待ち時間_秒】応答までの待ち時間（秒）"
+  },
+  {
+    "name": "handle_time_sec",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：処理時間_秒】通話および後処理時間（秒）"
+  },
+  {
+    "name": "is_abandoned",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：放棄呼フラグ】1:放棄呼（あふれ呼）、0:正常応答"
+  },
+  {
+    "name": "is_fcr",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：一次解決フラグ】1:初回解決、0:再入電またはエスカレーション発生"
+  }
+]

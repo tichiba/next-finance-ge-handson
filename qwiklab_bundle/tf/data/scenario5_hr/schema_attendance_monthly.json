@@ -1,0 +1,62 @@
+[
+  {
+    "name": "record_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：勤怠レコードID】主キー"
+  },
+  {
+    "name": "year_month",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：対象年月】対象年月（2026-04〜2026-09）"
+  },
+  {
+    "name": "employee_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：社員ID】外部キー（employees.employee_idと結合）"
+  },
+  {
+    "name": "division_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：所属本部】所属本部名"
+  },
+  {
+    "name": "overtime_hours",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：月間残業時間】当月残業時間（時間）"
+  },
+  {
+    "name": "paid_leave_days",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：有給取得日数】当月有給休暇取得日数（日）"
+  },
+  {
+    "name": "remote_work_days",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：リモート勤務日数】当月リモートワーク実施日数（日）"
+  },
+  {
+    "name": "late_night_hours",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：深夜労働時間】当月深夜労働時間（22時以降：時間）"
+  },
+  {
+    "name": "is_new_hire",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：当月入社フラグ】1:当月入社、0:既存在籍"
+  },
+  {
+    "name": "is_retired",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：当月退職フラグ】1:当月退職発生、0:継続在籍"
+  }
+]

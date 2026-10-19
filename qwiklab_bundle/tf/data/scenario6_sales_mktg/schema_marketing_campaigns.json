@@ -1,0 +1,62 @@
+[
+  {
+    "name": "campaign_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：施策ID】主キー（CMP-001〜CMP-040）"
+  },
+  {
+    "name": "campaign_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：キャンペーン名】マーケティング施策・キャンペーン名"
+  },
+  {
+    "name": "channel_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：チャネル種別】マーケティングチャネル種別（5分類）"
+  },
+  {
+    "name": "launch_month",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：実施月】キャンペーン実施年月（2026-04〜2026-09）"
+  },
+  {
+    "name": "spend_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：投下費用_円】マーケティング投下費用（円）"
+  },
+  {
+    "name": "leads_generated",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：獲得リード数】獲得リード件数（件）"
+  },
+  {
+    "name": "pipeline_generated_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：創出商談額_円】創出商談パイプライン総額（円）"
+  },
+  {
+    "name": "won_revenue_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：獲得受注額_円】獲得受注金額（円）"
+  },
+  {
+    "name": "roi_percentage",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：ROI_pct】投資対効果 ROI（%：(獲得受注金額-投下費用)/投下費用×100）"
+  },
+  {
+    "name": "win_rate_pct",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：受注率_pct】商談受注率（%）"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "name": "operator_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：オペレーターID】主キー（OP-001〜OP-050）"
+  },
+  {
+    "name": "operator_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：オペレーター氏名】担当者氏名"
+  },
+  {
+    "name": "team_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：所属チーム】所属受電チーム名"
+  },
+  {
+    "name": "skill_rank",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：スキルランク】S_エキスパート、A_シニア、B_スタンダード、C_ジュニア"
+  },
+  {
+    "name": "tenure_months",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：在籍月数】在籍月数（ヶ月）"
+  },
+  {
+    "name": "avg_handle_time_sec",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：平均処理時間_秒】平均処理時間 AHT（秒：通話＋後処理時間の平均）"
+  },
+  {
+    "name": "first_call_resolution_rate",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：一次解決率_pct】一次解決率 FCR（%：初回入電で解決した割合）"
+  },
+  {
+    "name": "avg_csat_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：平均満足度スコア】平均顧客満足度 CSAT（5段階評価：1.00〜5.00）"
+  },
+  {
+    "name": "monthly_calls_handled",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：月間応対件数】月間平均応対件数（件）"
+  }
+]

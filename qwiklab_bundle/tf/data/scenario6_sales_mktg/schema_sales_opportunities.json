@@ -1,0 +1,74 @@
+[
+  {
+    "name": "opportunity_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：商談ID】主キー（OPP-50001〜OPP-50600）"
+  },
+  {
+    "name": "lead_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：リードID】元リードID（leads_activities.lead_idと結合）"
+  },
+  {
+    "name": "campaign_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：施策ID】起因キャンペーンID（marketing_campaigns.campaign_idと結合）"
+  },
+  {
+    "name": "channel_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：チャネル種別】獲得チャネル種別（5分類）"
+  },
+  {
+    "name": "sales_department",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：担当営業部】担当営業部署名"
+  },
+  {
+    "name": "stage_name",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：商談フェーズ】商談フェーズ（5段階）"
+  },
+  {
+    "name": "created_month",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：商談創出月】商談創出年月（2026-04〜2026-09）"
+  },
+  {
+    "name": "close_date",
+    "type": "DATE",
+    "mode": "NULLABLE",
+    "description": "【日本語名：完了予定日】想定受注日・完了日"
+  },
+  {
+    "name": "deal_amount_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：商談金額_円】商談金額（円）"
+  },
+  {
+    "name": "probability_pct",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：受注確度_pct】受注確度（%：20, 40, 60, 80, 100）"
+  },
+  {
+    "name": "weighted_amount_jpy",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：期待商談額_円】確度加味期待商談金額（円）"
+  },
+  {
+    "name": "sales_cycle_days",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：リードタイム日数】商談リードタイム日数（日）"
+  }
+]

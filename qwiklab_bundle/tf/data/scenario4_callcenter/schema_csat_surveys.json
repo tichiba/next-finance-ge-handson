@@ -1,0 +1,44 @@
+[
+  {
+    "name": "survey_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：アンケートID】主キー"
+  },
+  {
+    "name": "call_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：入電ID】外部キー（call_logs.call_idと結合）"
+  },
+  {
+    "name": "operator_id",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：オペレーターID】外部キー（operators.operator_idと結合）"
+  },
+  {
+    "name": "csat_score",
+    "type": "INTEGER",
+    "mode": "NULLABLE",
+    "description": "【日本語名：満足度スコア】顧客満足度スコア（1〜5の5段階評価）"
+  },
+  {
+    "name": "nps_category",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：NPS区分】Promoter_推奨者、Passive_中立者、Detractor_批判者"
+  },
+  {
+    "name": "sentiment_score",
+    "type": "FLOAT",
+    "mode": "NULLABLE",
+    "description": "【日本語名：感情スコア】AI感情分析スコア（-1.00〜+1.00）"
+  },
+  {
+    "name": "voc_tag",
+    "type": "STRING",
+    "mode": "NULLABLE",
+    "description": "【日本語名：VOCトピック】顧客の声（VOC）主要トピック分類"
+  }
+]
