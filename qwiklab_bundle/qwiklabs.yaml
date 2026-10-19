@@ -188,27 +188,27 @@ environment:
       reference: project_0.project_id
     - label: "Common Password (全ユーザー共通パスワード)"
       reference: user_1.password
-    - label: "user00 / User 1 (ファシリテーター・管理者用)"
+    - label: "ユーザー名00 (ファシリテーター・管理者用)"
       reference: user_1.username
-    - label: "user00 / User 1 Google Drive"
+    - label: "ユーザー名00 Google Drive"
       reference: user_1.drive_url
-    - label: "user01 / User 2 (受講者1)"
+    - label: "ユーザー名01 (お客様受講者1)"
       reference: user_2.username
-    - label: "user02 / User 3 (受講者2)"
+    - label: "ユーザー名02 (お客様受講者2)"
       reference: user_3.username
-    - label: "user03 / User 4 (受講者3)"
+    - label: "ユーザー名03 (お客様受講者3)"
       reference: user_4.username
-    - label: "user04 / User 5 (受講者4)"
+    - label: "ユーザー名04 (お客様受講者4)"
       reference: user_5.username
-    - label: "user05 / User 6 (受講者5)"
+    - label: "ユーザー名05 (お客様受講者5)"
       reference: user_6.username
-    - label: "user06 / User 7 (受講者6)"
+    - label: "ユーザー名06 (お客様受講者6)"
       reference: user_7.username
-    - label: "user07 / User 8 (受講者7)"
+    - label: "ユーザー名07 (お客様受講者7)"
       reference: user_8.username
-    - label: "user08 / User 9 (受講者8)"
+    - label: "ユーザー名08 (お客様受講者8)"
       reference: user_9.username
-    - label: "user09 / User 10 (受講者9)"
+    - label: "ユーザー名09 (お客様受講者9)"
       reference: user_10.username
-    - label: "user10 / User 11 (受講者10・予備アカウント)"
+    - label: "ユーザー名10 (お客様受講者10・予備)"
       reference: user_11.username

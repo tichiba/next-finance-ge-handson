@@ -14,7 +14,7 @@ Gemini Notebook、Gemini Enterprise（社内文書・GWS横断検索 / モデル
 
 ## 🚀 講師・ファシリテーター用：Cloud Shell 自動構築ワンライナー
 
-Qwiklabs（`User 1` / `user00`）または Argolis 検証環境の **Cloud Shell** を開き、以下のワンライナーを実行すると、本リポジトリから `next-finance-ge-handson-qwiklab.zip` を自動取得・展開して全環境（11アカウント権限、BigQuery 4データセット・計12テーブル、社内規程データストア、Gemini Enterprise アプリ、4部門 A2A データ分析エージェント）を一括構築します。
+Qwiklabs（`ユーザー名00` で発行された管理者用 `student-xx-...@qwiklabs.net`）または Argolis 検証環境の **Cloud Shell** を開き、以下のワンライナーを実行すると、本リポジトリから `next-finance-ge-handson-qwiklab.zip` を自動取得・展開して全環境（プロジェクト内の全 `student-xx-...@qwiklabs.net` アカウント自動検出＆IAM権限付与、BigQuery 4データセット・計12テーブル、社内規程データストア、Gemini Enterprise アプリ、4部門 A2A データ分析エージェント）を一括構築します。
 
 ```bash
 curl -fL -o next-finance-ge-handson-qwiklab.zip https://raw.githubusercontent.com/tichiba/next-finance-ge-handson/main/docs/files/next-finance-ge-handson-qwiklab.zip && unzip -q -o next-finance-ge-handson-qwiklab.zip -d handson && bash handson/tf/scripts/setup.sh
