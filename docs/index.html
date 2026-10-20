@@ -712,12 +712,12 @@
                         <tr>
                             <td><strong>導入</strong><br>（5分）</td>
                             <td><strong>Gemini Enterprise ログイン＆画面確認</strong></td>
-                            <td>Chromebook から Gemini Enterprise Web アプリへログインし、チャット欄・エージェント・Notebook の画面構成を確認します。</td>
+                            <td>Chromebook（ゲストモード）で本 Codelab を開き、記載のリンクから Gemini Enterprise Web アプリへ配布アカウント（<code>student-xx-...@qwiklabs.net</code>）でログインして画面構成を確認します。</td>
                         </tr>
                         <tr>
                             <td><strong>シナリオ 1</strong><br>（10分）</td>
                             <td><strong>【Gemini Notebook】<br>経営戦略・業界動向のインプットと要点整理</strong></td>
-                            <td>①『NTTグループ統合報告書』『NTTファイナンスIR資料』を投入し、日本語の音声概要（ポッドキャスト）生成を開始<br>② 音声生成の待ち時間に、2資料を横断して重点戦略や事業課題をQA<br>③ 完成した日本語対談番組を試聴</td>
+                            <td>①『NTTグループ統合報告書（高速抜粋版）』『NTTファイナンスIR決算資料』を投入し、日本語の音声概要（ポッドキャスト）生成を開始<br>② 音声生成の待ち時間に、2資料を横断して重点戦略や事業課題をQA<br>③ 完成した日本語対談番組を試聴</td>
                         </tr>
                         <tr>
                             <td><strong>シナリオ 2</strong><br>（12分）</td>
@@ -732,11 +732,12 @@
                     </tbody>
                 </table>
 
-                <h3><span class="material-icons">login</span> Step 1-1：Gemini Enterprise へのログイン</h3>
+                <h3><span class="material-icons">login</span> Step 1-1：Gemini Enterprise Web アプリを開いてログイン</h3>
                 <ol>
-                    <li>手元の Chromebook を開き、すでにハンズオン用アカウント（Qwiklabs の<code class="inline">ユーザー名01</code>〜<code class="inline">ユーザー名10</code>で発行された <code class="inline">student-xx-xxxxxxxxxxxx@qwiklabs.net</code>）でログインされていることを確認します。<br>
-                    ※未ログインの場合は「ゲストとしてブラウジング」から Chrome を起動し、配布されたユーザーID（<code class="inline">student-xx-...@qwiklabs.net</code>）と共通パスワードでログインしてください。</li>
-                    <li>以下のリンク（または講師から案内された Gemini Enterprise Web App URL）を開きます。</li>
+                    <li>手元の Chromebook は<strong>「ゲストとしてブラウジング（ゲストモード）」</strong>で利用するため、<strong>Chromebook 本体へのログインは不要</strong>です。<br>
+                    ブラウザのアドレスバーに <code class="inline">https://goo.gle/ntt-gemini</code> を入力し、この Codelab ページが開いていることを確認します（スライド P.10）。</li>
+                    <li>下のカードにある <strong>［Gemini Enterprise Web アプリを開く］</strong> ボタンをクリックします。</li>
+                    <li>Google のログイン画面が表示されたら、講師から配布された <strong>ユーザーID（<code class="inline">student-xx-xxxxxxxxxxxx@qwiklabs.net</code>）</strong> と <strong>共通パスワード</strong> を入力してログインします。</li>
                 </ol>
 
                 <div class="resource-grid">
@@ -744,18 +745,27 @@
                         <div class="resource-header">
                             <div class="resource-title">
                                 <span class="material-icons" style="color:var(--primary-color);">launch</span>
-                                Gemini Enterprise Web アプリ（短縮URL / ランチャー）
-                                <span class="badge badge-blue">メイン画面</span>
+                                Gemini Enterprise Web アプリ（メイン画面）
+                                <span class="badge badge-blue">ここから起動</span>
                             </div>
+                            <a class="btn-download" id="btn-open-ge-primary" href="https://vertexaisearch.cloud.google.com/" target="_blank" rel="noopener" style="background-color:var(--primary-color); font-size:13.5px; padding:8px 18px;">
+                                <span class="material-icons" style="font-size:16px;">open_in_new</span> Gemini Enterprise Web アプリを開く
+                            </a>
                         </div>
+                        <p style="margin:0; font-size:13px; color:var(--secondary-text);">
+                            ▼ 上記ボタンをクリックすると別タブで Gemini Enterprise が開きます。ログイン画面が表示されたら配布された <code class="inline">student-xx-xxxxxxxxxxxx@qwiklabs.net</code> でログインしてください。
+                        </p>
                         <div class="url-row">
-                            <span class="url-text" id="url-ge-short">https://goo.gle/ntt-gemini</span>
+                            <span class="url-text" id="url-ge-webapp">https://vertexaisearch.cloud.google.com/</span>
                             <div class="url-actions">
-                                <button class="copy-btn" onclick="copyText('https://goo.gle/ntt-gemini', this)">
+                                <button class="copy-btn" id="btn-copy-ge-webapp" onclick="copyText(document.getElementById('url-ge-webapp').innerText, this)">
                                     <span class="material-icons">content_copy</span> URLをコピー
                                 </button>
-                                <a class="btn-outline" href="https://vertexaisearch.cloud.google.com/" target="_blank" rel="noopener">
-                                    <span class="material-icons" style="font-size:15px;">open_in_new</span> 開く
+                                <a class="btn-outline" id="link-open-ge-secondary" href="https://vertexaisearch.cloud.google.com/" target="_blank" rel="noopener">
+                                    <span class="material-icons" style="font-size:15px;">open_in_new</span> Webアプリを開く
+                                </a>
+                                <a class="btn-outline" href="https://console.cloud.google.com/ai/agentspace" target="_blank" rel="noopener" title="初回アクセス時にアプリ選択が必要な場合はこちらから開けます">
+                                    <span class="material-icons" style="font-size:15px;">admin_panel_settings</span> アプリ一覧（Console）
                                 </a>
                             </div>
                         </div>
@@ -764,39 +774,9 @@
 
                 <div class="note">
                     <strong>💡 初回ログイン時の確認ポイント：</strong><br>
-                    ・画面中央に<strong>チャット入力欄</strong>、左メニューに<strong>「Gemini Notebook（または NotebookLM）」「エージェント（Agents）」</strong>が表示されていることを確認します。<br>
+                    ・ログイン後、画面中央に<strong>チャット入力欄</strong>、左メニューに<strong>「Gemini Notebook（または NotebookLM）」「エージェント（Agents）」</strong>が表示されていることを確認します（もし初回アクセス時にアプリが選択されていない場合は、右側の「アプリ一覧（Console）」から『ネクストファイナンス Gemini Enterprise ハンズオン』の Web アプリ URL を開いてください）。<br>
                     ・チャット入力欄の下部にあるソース／コネクタアイコンで Google ドライブ等の「承認（Authorize）」ボタンが表示された場合は、クリックして許可（Allow）してください。
                 </div>
-
-                <!-- 講師・ファシリテーター向け：環境構築ZIPダウンロード＆Cloud Shellワンライナー -->
-                <details style="margin: 20px 0; border: 1px solid var(--border-color); border-radius: 10px; background: #ffffff; padding: 14px 18px;">
-                    <summary style="cursor: pointer; font-weight: 700; color: var(--secondary-text); font-size: 13.5px; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-icons" style="font-size: 18px; color: var(--primary-color);">build_circle</span>
-                        【講師・ファシリテーター用】環境構築 ZIP ダウンロード ＆ Cloud Shell 自動構築コマンド（クリックで展開）
-                    </summary>
-                    <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
-                        <p style="font-size: 13.5px; margin-bottom: 10px;">
-                            ハンズオン開始前（12:00〜）に、管理者アカウント（Qwiklabs <code>ユーザー名00</code> で発行された <code>student-xx-...@qwiklabs.net</code>）の <strong>Cloud Shell</strong> で以下のワンライナーを実行すると、GitHub から構築用 ZIP（<code>next-finance-ge-handson-qwiklab.zip</code>）を直接ダウンロードして全環境（プロジェクト内の全 <code>student-xx-...@qwiklabs.net</code> アカウント自動検出＆IAM権限付与・BigQuery 4データセット・4エージェント・社内規程データストア）を自動構築します。
-                        </p>
-                        <div style="margin-bottom: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
-                            <a class="btn-download" href="./files/next-finance-ge-handson-qwiklab.zip" download="next-finance-ge-handson-qwiklab.zip">
-                                <span class="material-icons" style="font-size:16px;">folder_zip</span> 環境構築バンドル（next-finance-ge-handson-qwiklab.zip）をダウンロード
-                            </a>
-                        </div>
-                        <div class="prompt-card secondary" style="margin: 8px 0 0;">
-                            <div class="prompt-card-header">
-                                <div class="prompt-card-title">
-                                    <span class="material-icons">terminal</span>
-                                    Cloud Shell 自動構築ワンライナー（ZIP自動取得＋setup.sh実行）
-                                </div>
-                                <button class="copy-btn" onclick="copyFromElement('prompt-facilitator-setup', this)">
-                                    <span class="material-icons">content_copy</span> コマンドをコピー
-                                </button>
-                            </div>
-                            <pre class="prompt-body" id="prompt-facilitator-setup">curl -fL -o next-finance-ge-handson-qwiklab.zip https://raw.githubusercontent.com/tichiba/next-finance-ge-handson/main/docs/files/next-finance-ge-handson-qwiklab.zip && unzip -q -o next-finance-ge-handson-qwiklab.zip -d handson && bash handson/tf/scripts/setup.sh</pre>
-                        </div>
-                    </div>
-                </details>
 
                 <div class="nav-buttons">
                     <div></div>
@@ -817,12 +797,13 @@
 
                 <p>長大な統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>日本語の対談ポッドキャスト（音声概要）の自動生成</strong>と、<strong>複数資料を横断した引用付きQA</strong>を体験します。</p>
 
-                <h3><span class="material-icons">folder_open</span> Step 1-1：投入する2つの資料（PDFダウンロード または 公式URLコピー）</h3>
-                <p>以下の<strong>「ハンズオン高速処理用 抜粋版PDF（2点）」</strong>をワンクリックでダウンロードしてアップロードするか、または<strong>NTTグループ統合報告書・NTTファイナンス公式IR資料の公開URL</strong>をコピーしてご使用いただけます。</p>
+                <h3><span class="material-icons">folder_open</span> Step 1-1：投入する2つの資料（高速抜粋版PDFダウンロード または 軽量URLコピー）</h3>
+                <p>公式の『NTTグループ統合報告書 2026（全101ページ・15MB）』をそのまま読み込むとページ解析に2〜3分以上かかるため、<strong>本物の統合報告書から主要12ページ（中期経営戦略・CEO/CFOメッセージ・事業目標・AI戦略等）のみを原本デザインのまま抜粋した高速版PDF（1.5MB・読込約3〜5秒）</strong>と、<strong>NTTファイナンスの軽量決算・IR資料</strong>を用意しています。</p>
 
                 <div class="tip">
-                    <strong>⚡ おすすめ（10分枠での高速生成用）：</strong><br>
-                    10分間のハンズオン時間内で音声生成（約2〜3分）を確実に完了させるため、まずは下記の<strong>緑色ボタン「① 統合報告書（抜粋版PDF）」「② IR資料（ハイライト版PDF）」</strong>の2ファイルをダウンロードして Notebook にアップロードする方法を推奨します。
+                    <strong>⚡ おすすめ（数秒で読込完了する高速投入方法）：</strong><br>
+                    ・<strong>方法A（PDFファイルをアップロード）</strong>：下記の緑色ボタン<strong>「① NTTグループ統合報告書 2026（主要12P高速抜粋版PDF）」「② NTTファイナンス IRハイライト資料（または公式決算PDF）」</strong>をダウンロードし、Notebook にアップロードします（約3〜5秒で読込完了）。<br>
+                    ・<strong>方法B（URLをコピー＆ペースト）</strong>：各カード内の <strong>［URLをコピー］</strong> をクリックし、Notebook のソース追加画面の<strong>「ウェブサイト（Website）」</strong>に貼り付けて追加することも可能です。
                 </div>
 
                 <div class="resource-grid">
@@ -831,35 +812,51 @@
                         <div class="resource-header">
                             <div class="resource-title">
                                 <span class="material-icons" style="color:var(--primary-color);">picture_as_pdf</span>
-                                資料①：NTTグループ統合報告書（Integrated Report）
-                                <span class="badge badge-green">必須ソース①</span>
+                                資料①：NTTグループ統合報告書 2026（主要12ページ高速抜粋版）
+                                <span class="badge badge-green">必須ソース①（読込3〜5秒）</span>
                             </div>
-                            <a class="btn-download" href="./files/next_group_integrated_report_2026.pdf" download="next_group_integrated_report_2026.pdf">
-                                <span class="material-icons" style="font-size:16px;">download</span> ① 統合報告書（高速抜粋版PDF）をダウンロード
-                            </a>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <a class="btn-download" href="./files/ntt_group_integrated_report_2026_excerpt.pdf" download="ntt_group_integrated_report_2026_excerpt.pdf">
+                                    <span class="material-icons" style="font-size:16px;">download</span> ① 統合報告書2026（公式12P抜粋版・1.5MB）をDL
+                                </a>
+                                <a class="btn-outline" href="./files/next_group_integrated_report_2026.pdf" download="next_group_integrated_report_2026.pdf">
+                                    <span class="material-icons" style="font-size:15px;">bolt</span> 超軽量1P要約版（465KB）をDL
+                                </a>
+                            </div>
                         </div>
                         <p style="margin:0; font-size:13px; color:var(--secondary-text);">
-                            ▼ 公式Webサイトで公開されている『NTTグループ統合報告書』原本PDF・掲載ページのURLはこちら（1クリックでコピー可能）：
+                            ▼ URLで NotebookLM（「ウェブサイト」ソース）に直接貼り付ける場合はこちら（上から順に高速です）：
                         </p>
                         <div class="url-row">
-                            <span class="url-text">【公式PDF】NTTグループ統合報告書 2026: https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf</span>
+                            <span class="url-text">【推奨・高速12P抜粋版PDF (1.5MB / 約3〜5秒)】https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf</span>
                             <div class="url-actions">
-                                <button class="copy-btn" onclick="copyText('https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf', this)">
+                                <button class="copy-btn" onclick="copyText('https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf', this)">
                                     <span class="material-icons">content_copy</span> URLをコピー
                                 </button>
-                                <a class="btn-outline" href="https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf" target="_blank" rel="noopener">
+                                <a class="btn-outline" href="./files/ntt_group_integrated_report_2026_excerpt.pdf" target="_blank" rel="noopener">
+                                    <span class="material-icons" style="font-size:14px;">open_in_new</span> PDFを開く
+                                </a>
+                            </div>
+                        </div>
+                        <div class="url-row">
+                            <span class="url-text">【公式・非財務データ編PDF (3.0MB / 約10〜15秒)】https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j_nonfinancial.pdf</span>
+                            <div class="url-actions">
+                                <button class="copy-btn" onclick="copyText('https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j_nonfinancial.pdf', this)">
+                                    <span class="material-icons">content_copy</span> URLをコピー
+                                </button>
+                                <a class="btn-outline" href="https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j_nonfinancial.pdf" target="_blank" rel="noopener">
                                     <span class="material-icons" style="font-size:14px;">open_in_new</span> 公式PDFを開く
                                 </a>
                             </div>
                         </div>
                         <div class="url-row">
-                            <span class="url-text">【公式PDF】NTTグループ統合報告書 2025: https://group.ntt/jp/ir/library/annual/pdf/integrated_report_25j.pdf</span>
+                            <span class="url-text">【参考：公式フル原本PDF (全101P・15MB ※読込に2〜3分かかります)】https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf</span>
                             <div class="url-actions">
-                                <button class="copy-btn" onclick="copyText('https://group.ntt/jp/ir/library/annual/pdf/integrated_report_25j.pdf', this)">
+                                <button class="copy-btn" onclick="copyText('https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf', this)">
                                     <span class="material-icons">content_copy</span> URLをコピー
                                 </button>
-                                <a class="btn-outline" href="https://group.ntt/jp/ir/library/annual/" target="_blank" rel="noopener">
-                                    <span class="material-icons" style="font-size:14px;">open_in_new</span> 統合報告書一覧ページ
+                                <a class="btn-outline" href="https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf" target="_blank" rel="noopener">
+                                    <span class="material-icons" style="font-size:14px;">open_in_new</span> 公式原本を開く
                                 </a>
                             </div>
                         </div>
@@ -870,18 +867,23 @@
                         <div class="resource-header">
                             <div class="resource-title">
                                 <span class="material-icons" style="color:var(--primary-color);">picture_as_pdf</span>
-                                資料②：NTTファイナンス IR決算・事業財務ハイライト資料
-                                <span class="badge badge-green">必須ソース②</span>
+                                資料②：NTTファイナンス 決算・事業財務ハイライト資料
+                                <span class="badge badge-green">必須ソース②（読込2〜3秒）</span>
                             </div>
-                            <a class="btn-download" href="./files/next_finance_ir_highlights_2026.pdf" download="next_finance_ir_highlights_2026.pdf">
-                                <span class="material-icons" style="font-size:16px;">download</span> ② IR資料（ハイライト版PDF）をダウンロード
-                            </a>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <a class="btn-download" href="./files/next_finance_ir_highlights_2026.pdf" download="next_finance_ir_highlights_2026.pdf">
+                                    <span class="material-icons" style="font-size:16px;">download</span> ② IR事業ハイライト・重点課題PDF（2P・588KB）をDL
+                                </a>
+                                <a class="btn-outline" href="./files/ntt_finance_kessan_r7.pdf" download="ntt_finance_kessan_r7.pdf">
+                                    <span class="material-icons" style="font-size:15px;">download</span> 公式 決算・連結計算書類PDF（106KB）をDL
+                                </a>
+                            </div>
                         </div>
                         <p style="margin:0; font-size:13px; color:var(--secondary-text);">
-                            ▼ NTTファイナンス公式サイトで公開されている決算資料・有価証券報告書・財務ハイライトのURLはこちら：
+                            ▼ NTTファイナンス公式の軽量決算PDF（106KB）および財務ハイライトWebページ（HTML）のURLはこちら（どちらも2〜3秒で高速読込可能）：
                         </p>
                         <div class="url-row">
-                            <span class="url-text">【公式PDF】決算・連結計算書類: https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf</span>
+                            <span class="url-text">【公式・超軽量PDF (106KB / 約2〜3秒)】決算・連結計算書類: https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf</span>
                             <div class="url-actions">
                                 <button class="copy-btn" onclick="copyText('https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf', this)">
                                     <span class="material-icons">content_copy</span> URLをコピー
@@ -892,13 +894,24 @@
                             </div>
                         </div>
                         <div class="url-row">
-                            <span class="url-text">【公式PDF】第41期 有価証券報告書: https://www.ntt-finance.co.jp/ir/shoken/pdf/yuukashouken_41.pdf</span>
+                            <span class="url-text">【公式・財務ハイライトWeb (HTML / 約1〜2秒)】https://www.ntt-finance.co.jp/ir/highlight/</span>
                             <div class="url-actions">
-                                <button class="copy-btn" onclick="copyText('https://www.ntt-finance.co.jp/ir/shoken/pdf/yuukashouken_41.pdf', this)">
+                                <button class="copy-btn" onclick="copyText('https://www.ntt-finance.co.jp/ir/highlight/', this)">
                                     <span class="material-icons">content_copy</span> URLをコピー
                                 </button>
                                 <a class="btn-outline" href="https://www.ntt-finance.co.jp/ir/highlight/" target="_blank" rel="noopener">
-                                    <span class="material-icons" style="font-size:14px;">open_in_new</span> 財務ハイライトWeb
+                                    <span class="material-icons" style="font-size:14px;">open_in_new</span> Webを開く
+                                </a>
+                            </div>
+                        </div>
+                        <div class="url-row">
+                            <span class="url-text">【ハンズオン用・事業ハイライト＆重点課題まとめPDF (588KB / 約2秒)】https://tichiba.github.io/next-finance-ge-handson/files/next_finance_ir_highlights_2026.pdf</span>
+                            <div class="url-actions">
+                                <button class="copy-btn" onclick="copyText('https://tichiba.github.io/next-finance-ge-handson/files/next_finance_ir_highlights_2026.pdf', this)">
+                                    <span class="material-icons">content_copy</span> URLをコピー
+                                </button>
+                                <a class="btn-outline" href="./files/next_finance_ir_highlights_2026.pdf" target="_blank" rel="noopener">
+                                    <span class="material-icons" style="font-size:14px;">open_in_new</span> PDFを開く
                                 </a>
                             </div>
                         </div>
@@ -908,7 +921,7 @@
                 <h3><span class="material-icons">podcasts</span> Step 1-2：Notebook の作成と「音声概要（Audio Overview）」の生成開始</h3>
                 <ol>
                     <li>Gemini Enterprise 左メニューから <strong>「Gemini Notebook（または NotebookLM）」</strong> を開き、<strong>［＋ 新規作成（New Notebook）］</strong>をクリックします。</li>
-                    <li>ソース追加画面（<strong>「＋Add」</strong>）で、ダウンロードした2つのPDFファイルをアップロードします。</li>
+                    <li>ソース追加画面（<strong>「＋Add」</strong>）で、ダウンロードした2つの軽量PDFファイルをドラッグ＆ドロップしてアップロードします（またはコピーしたURLを<strong>「ウェブサイト（Website）」</strong>から貼り付けて追加します）。</li>
                     <li>画面右側の <strong>Studio パネル</strong> 内にある <strong>「音声概要（Audio Overview）」</strong> の編集アイコン（カスタマイズ）をクリックし、以下のプロンプトをコピー＆ペーストして <strong>［生成（Generate）］</strong> を開始します。</li>
                 </ol>
 
@@ -1154,8 +1167,8 @@
 
                 <ol>
                     <li>メインチャット（ホーム）の入力欄に以下の<strong>「① 統合レポート作成プロンプト」</strong>を貼り付けて実行します。</li>
-                    <li>レポートが生成されたら、回答下部の <strong>［Google ドキュメントにエクスポート］</strong> アイコンをクリックして保存します。</li>
-                    <li>続けて、画面を切り替えずに同じチャット入力欄の <strong>［ツール（＋）］→［Canvas］</strong> を選択し、<strong>「② Canvas 5枚スライド生成プロンプト」</strong>を送信します。</li>
+                    <li>レポートが生成されたら、回答下部の <strong>［Google ドキュメントにエクスポート］</strong> アイコンをクリックして保存します（必要に応じて下の推奨タイトルをコピーしてドキュメント名を変更してください）。</li>
+                    <li>続けて、画面を切り替えずに同じチャット入力欄の下部にある <strong>［ツール（＋）］→［Canvas］</strong> を選択（またはそのまま入力欄に貼り付け）し、<strong>「② Canvas 5枚スライド生成プロンプト」</strong>を送信します。</li>
                 </ol>
 
                 <!-- スライド P.32 ① 統合レポート生成プロンプト -->
@@ -1337,6 +1350,21 @@
     </div>
 
     <script>
+        // URLパラメータ (?cid=xxx または ?app=https://...) で Gemini Enterprise Web App URL を動的反映可能
+        (function initGeWebAppUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const cid = params.get('cid');
+            const appUrl = params.get('app') || (cid ? `https://vertexaisearch.cloud.google.com/home/cid/${encodeURIComponent(cid)}` : null);
+            if (appUrl) {
+                const urlSpan = document.getElementById('url-ge-webapp');
+                const btnPrimary = document.getElementById('btn-open-ge-primary');
+                const linkSecondary = document.getElementById('link-open-ge-secondary');
+                if (urlSpan) urlSpan.textContent = appUrl;
+                if (btnPrimary) btnPrimary.href = appUrl;
+                if (linkSecondary) linkSecondary.href = appUrl;
+            }
+        })();
+
         function showStep(stepIndex) {
             const steps = document.querySelectorAll('.step-content');
             const navItems = document.querySelectorAll('.step-item');

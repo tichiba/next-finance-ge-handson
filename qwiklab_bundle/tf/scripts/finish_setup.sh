@@ -871,6 +871,17 @@ done
 
 rm -f /tmp/agents_spec.json /tmp/da_payload_*.json /tmp/register_a2a_*.json /tmp/card_*.json
 
+WIDGET_CFG_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/widgetConfigs/default_search_widget_config" || true)
+CID=$(python3 -c "
+import json
+try:
+    d = json.loads('''${WIDGET_CFG_JSON}''')
+    print(d.get('configId', ''))
+except Exception:
+    print('')
+")
+
 echo ""
 echo "=============================================================================="
 echo " ✅ セットアップ完了サマリー (Verification Summary - 11アカウント対応)"
@@ -889,14 +900,16 @@ echo "    - next_finance_3db_agent        : 請求・入金・与信分析"
 echo "    - next_finance_callcenter_agent : コールセンター分析"
 echo "    - next_finance_hr_agent         : 人事・タレント分析"
 echo "    - next_finance_sales_agent      : 営業・マーケROI分析"
-echo " 4. シナリオ1用 IR 資料 PDF ダウンロード URL :"
-echo "    - ① 統合報告書(抜粋版): https://storage.cloud.google.com/${BUCKET_NAME}/scenario1/next_group_integrated_report_2026.pdf"
-echo "    - ② IR資料(ハイライト): https://storage.cloud.google.com/${BUCKET_NAME}/scenario1/next_finance_ir_highlights_2026.pdf"
-echo "    - [公式] NTTグループ統合報告書: https://group.ntt/jp/ir/library/annual/pdf/integrated_report_26j.pdf"
-echo "    - [公式] NTTファイナンス決算資料: https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf"
-echo " 5. Gemini Enterprise 管理画面 URL (Model: ${MODEL_ID}) :"
-echo "    https://console.cloud.google.com/ai/agentspace/locations/global/engines/${ENGINE_ID}/overview?project=${PROJECT_ID}"
-echo "    ※左メニュー [Integration (統合)] から Web App URL をコピーして配布してください。"
+echo " 4. シナリオ1用 高速抜粋版 IR 資料 PDF ダウンロード URL :"
+echo "    - ① NTTグループ統合報告書2026(公式12P高速抜粋・1.5MB): https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf"
+echo "    - ② NTTファイナンス決算資料(公式・106KB)             : https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf"
+echo "    - ③ IR事業ハイライト・重点課題まとめ(2P・588KB)      : https://tichiba.github.io/next-finance-ge-handson/files/next_finance_ir_highlights_2026.pdf"
+echo " 5. Gemini Enterprise Web App / 管理画面 URL (Model: ${MODEL_ID}) :"
+if [ -n "${CID}" ]; then
+  echo "    - Web App 直接URL : https://vertexaisearch.cloud.google.com/home/cid/${CID}"
+  echo "    - Codelab (CID付) : https://tichiba.github.io/next-finance-ge-handson/?cid=${CID}"
+fi
+echo "    - Console 管理画面: https://console.cloud.google.com/ai/agentspace/locations/global/engines/${ENGINE_ID}/overview?project=${PROJECT_ID}"
 echo " 6. 全リソース削除（クリーンアップ）コマンド :"
 echo "    bash handson/tf/scripts/cleanup.sh ${PROJECT_ID}"
 echo "=============================================================================="
