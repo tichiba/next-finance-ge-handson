@@ -646,6 +646,35 @@
             color: #c5221f;
         }
 
+        .mention-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background-color: #e8f0fe;
+            color: #1967d2;
+            border: 1px solid #aecbfa;
+            padding: 3px 10px;
+            border-radius: 14px;
+            font-family: 'Google Sans', 'Noto Sans JP', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+        .mention-bar {
+            background-color: #ffffff;
+            padding: 12px 18px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mention-hint {
+            font-size: 12px;
+            color: var(--secondary-text);
+        }
+
         @media (max-width: 860px) {
             .sidebar {
                 display: none;
@@ -764,7 +793,7 @@
                         <tr>
                             <td><strong>シナリオ 3</strong><br>18分</td>
                             <td><strong>【GE + AIエージェント】<br>未収データ分析と経営会議レポート作成</strong></td>
-                            <td>① <code>@請求・入金・与信分析</code> で月次回収率推移と未収リスク業種・ランクをグラフ化<br>② 要注意法人トップ10社と与信枠見直し効果を対話で試算<br>③ シナリオ2の経緯と統合し、経営会議レポートと報告スライドを1クリック出力</td>
+                            <td>① <span class="mention-chip">@請求・入金・与信分析</span> で月次回収率推移と未収リスク業種・ランクをグラフ化<br>② 要注意法人トップ10社の特定と、今後半年間の将来予測＆対策シミュレーション<br>③ シナリオ2の経緯と統合し、経営会議レポートと報告スライドを出力</td>
                         </tr>
                     </tbody>
                 </table>
@@ -926,11 +955,8 @@
                     <div class="prompt-body" id="prompt-s1-qa-3">2つの資料に記載されている「デジタル化・AI活用」「キャッシュフロー創出」「債権・財務管理」の観点から、今後さらに強化すべきビジネス機会と注意すべき事業リスクをそれぞれ3点ずつ提案してください。</div>
                 </div>
 
-                <h3><span class="material-icons">headphones</span> Step 1-4：引用箇所の確認とスライド・音声解説の確認</h3>
-                <ol>
-                    <li>回答内の<strong>引用番号</strong>をクリックすると、元PDFの該当箇所がハイライト表示され、裏付け確認が可能です。</li>
-                    <li>右側 Studio パネルの下部に <strong>スライド資料</strong> と <strong>音声解説</strong> が完成したら、クリックしてスライドの閲覧や日本語対談番組の試聴を行います。</li>
-                </ol>
+                <h3><span class="material-icons">headphones</span> Step 1-4：スライド資料と音声解説の確認</h3>
+                <p>右側 Studio パネルの下部に <strong>スライド資料</strong> と <strong>音声解説</strong> が完成したら、クリックしてスライドの閲覧や日本語対談番組の試聴を行います。</p>
 
                 <div class="nav-buttons">
                     <button class="btn btn-prev" onclick="showStep(0)">
@@ -1034,84 +1060,77 @@
                 </div>
 
                 <p>シナリオ2で「物流・建設セクターで同様の遅延相談が増えている」という現場の懸念が判明しました。<br>
-                ここでは <strong>データ分析エージェント（<code class="inline">@請求・入金・与信分析</code>）</strong> を呼び出し、SQLを1行も書かずに「① 請求データ」「② 入金・消込データ」「③ 顧客与信マスタ」を自然言語で掛け合わせて分析し、そのまま経営会議レポートとプレゼンスライドを出力します。</p>
+                ここでは <strong>データ分析エージェント（<span class="mention-chip">@請求・入金・与信分析</span>）</strong> を呼び出し、「① 請求データ」「② 入金・消込データ」「③ 顧客与信マスタ」の3つのデータを<strong>日本語で</strong>掛け合わせて分析・将来予測し、そのまま経営会議レポートとプレゼンスライドを作成します。</p>
 
                 <div class="tip">
                     <strong>💡 エージェントの呼び出し方：</strong><br>
-                    シナリオ2を実行した<strong>同じメインチャットの入力欄</strong>で半角の <code class="inline">@</code> を入力し、候補から <strong><code class="inline">@請求・入金・与信分析</code></strong> を選択してプロンプトを送信します（左メニューの「エージェント」から選択して対話することも可能です）。
+                    シナリオ2を実行した<strong>同じメインチャットの入力欄</strong>で半角の <code class="inline">@</code> を入力し、候補から <strong><span class="mention-chip">@請求・入金・与信分析</span></strong> をクリックして選択したあと、下のプロンプトをコピーして貼り付けます。
                 </div>
 
                 <h3><span class="material-icons">show_chart</span> Step 3-1：全体傾向の把握</h3>
                 <p>まずは全社の月次請求・入金・回収率の推移と、どの業種・与信ランクに未収リスクが集中しているかを可視化します。</p>
 
-                <!-- スライド P.29 掲載プロンプト -->
                 <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
                             <span class="material-icons">insights</span>
-                            全体傾向の把握プロンプト
+                            ① 全体傾向の把握プロンプト
                         </div>
                         <button class="copy-btn" onclick="copyFromElement('prompt-s3-step1-slide', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s3-step1-slide">@請求・入金・与信分析
-「請求・入金・顧客与信」のデータを掛け合わせ、以下を可視化してください。
+                    <div class="mention-bar">
+                        <span class="mention-chip">@請求・入金・与信分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-s3-step1-slide">「請求・入金・顧客与信」のデータを掛け合わせ、以下を可視化してください。
 (1) 2026年4月〜9月の月次請求額・入金済額・未収残高・回収率の推移（折れ線グラフ）
 (2) 未収リスクが拡大している「業種×与信ランク」別の未収残高・遅延傾向（棒グラフと表）</div>
                 </div>
 
-                <!-- エージェント専用画面で実行する場合（@なし版） -->
-                <div class="prompt-card secondary">
-                    <div class="prompt-card-header">
-                        <div class="prompt-label">
-                            <span class="material-icons">analytics</span>
-                            エージェント個別画面用（@メンションなし）
-                        </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s3-step1-detail', this)">
-                            <span class="material-icons">content_copy</span> プロンプトをコピー
-                        </button>
-                    </div>
-                    <div class="prompt-body" id="prompt-s3-step1-detail">2026年4月〜9月の月次請求総額・入金済額・未収残高・回収率の推移を集計し、折れ線グラフで可視化してください。あわせて、契約区分および業種/セグメント別・与信ランク別に6ヶ月累計の「請求総額」「現在の未収残高と未収率」を集計し、どのセグメントにリスクが集中しているか教えてください。</div>
-                </div>
+                <h3><span class="material-icons">bar_chart</span> Step 3-2：要注意の大口取引先トップ10社の特定</h3>
+                <p>回収率が4月の <strong>98.80%</strong> から9月に <strong>93.80%</strong> へ低下し、物流・建設セクターの要注意層（C1/C2）に未収が集中していることが分かりました。続けて同じチャットで、<strong>要注意の大口取引先トップ10社</strong>を抽出します。</p>
 
-                <h3><span class="material-icons">bar_chart</span> Step 3-2：明細レベルへの対話ドリルダウンと債権保全シミュレーション</h3>
-                <p>回収率が4月の <strong>98.80%</strong> から9月に <strong>93.80%</strong> へ低下し、物流・建設セクターの要注意層（C1/C2）に未収が集中していることが分かりました。続けて同じスレッドで、<strong>要注意の大口取引先トップ10社の抽出</strong>と<strong>与信枠見直し・保全措置によるリスク低減シミュレーション</strong>を行います。</p>
-
-                <!-- スライド P.30 掲載プロンプト -->
                 <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
                             <span class="material-icons">leaderboard</span>
-                            明細ドリルダウン＆対策効果シミュレーション
+                            ② 明細ドリルダウン（要注意トップ10社の特定）
                         </div>
                         <button class="copy-btn" onclick="copyFromElement('prompt-s3-step2-slide', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s3-step2-slide">@請求・入金・与信分析
-続けて明細レベルへ深掘り分析してください。
-(1) 未収・遅延の主要因である要注意の大口取引先トップ10社（業種・ランク・未収額・遅延日数）を棒グラフと表で表示
-(2) 高リスク先の与信枠見直しと口座振替への切替による未収リスク低減効果をシミュレーション</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@請求・入金・与信分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-s3-step2-slide">続けて明細レベルへ深掘り分析してください。未収・遅延の主要因である要注意の大口取引先トップ10社（業種・ランク・未収額・遅延日数）を棒グラフと表で表示してください。</div>
                 </div>
 
-                <!-- 規程第14条・第18条の数値（20%圧縮・60%保証）明記版 -->
-                <div class="prompt-card secondary">
+                <h3><span class="material-icons">trending_up</span> Step 3-3：将来値の予測と対策シミュレーション</h3>
+                <p>実績データの把握だけでなく、<strong>「このまま放置したら半年後に未収がどこまで膨らむか」の将来予測</strong>と、<strong>「与信枠見直し・債権保全を行った場合の改善シミュレーション」</strong>を日本語の指示だけで一気に出力させます。</p>
+
+                <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
-                            <span class="material-icons">calculate</span>
-                            詳細版：与信枠20%圧縮＋債権保証60%カバーを試算させるプロンプト
+                            <span class="material-icons">timeline</span>
+                            ③ 今後半年間の将来予測＆対策シミュレーション
                         </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s3-step2-detail', this)">
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s3-step3-forecast', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s3-step2-detail">法人_多回線一括請求の要注意顧客（ランクC1・C2）について、累積未収残高が多いトップ10社を抽出して棒グラフで比較してください。
-さらに社内規程（第14条・第18条）に基づき、各社の与信限度額を20%圧縮した場合の新与信枠と、未収残高の60%を債権保証で保全カバーした場合のリスク低減額および残余リスク額を試算してください。</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@請求・入金・与信分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-s3-step3-forecast">2026年4月〜9月の推移トレンドをもとに、今後半年間（2026年10月〜2027年3月）の月次の「未収残高」と「回収率」の将来予測値を算出してください。あわせて、「① このまま放置した場合」と「② 要注意先の与信枠見直し・債権保全（未収リスク60%低減）を実施した場合」の2パターンで将来予測をグラフと表で比較してください。</div>
                 </div>
 
-                <h3><span class="material-icons">description</span> Step 3-3：経営会議レポートと報告スライドの出力</h3>
-                <p>最後に、<strong>シナリオ2で確認した東都ロジスティクスの経緯・決裁基準</strong>と、<strong>シナリオ3の全社データ分析・保全シミュレーション結果</strong>を統合し、経営会議に付議するレポートとプレゼンスライドを作成します。</p>
+                <h3><span class="material-icons">description</span> Step 3-4：経営会議レポートと報告スライドの出力</h3>
+                <p>最後に、<strong>シナリオ2で確認した東都ロジスティクスの経緯・決裁基準</strong>と、<strong>シナリオ3の全社データ分析・将来予測結果</strong>を統合し、経営会議に付議するレポートとプレゼンスライドを作成します（ここでは <code class="inline">@</code> メンションは不要です）。</p>
 
                 <ol>
                     <li>メインチャットの入力欄に以下の<strong>「① 統合レポート作成プロンプト」</strong>を貼り付けて実行します。</li>
@@ -1130,7 +1149,7 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s3-step3-report">これまでの社内規程・メール確認結果と、@請求・入金・与信分析 の分析結果（回収率推移・要注意トップ10社・保全試算）を統合し、経営会議向けの『大口契約先の支払条件変更決裁および全社債権リスク対策レポート』を作成してください。</div>
+                    <div class="prompt-body" id="prompt-s3-step3-report">これまでの社内規程・メール確認結果と、先ほどのデータ分析および将来予測の結果（回収率推移・要注意トップ10社・半年後の将来予測と保全試算）を統合し、経営会議向けの『大口契約先の支払条件変更決裁および全社債権リスク対策レポート』を作成してください。</div>
                 </div>
 
                 <!-- スライド P.32 ② Canvas スライド生成プロンプト -->
@@ -1144,7 +1163,7 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s3-step3-canvas">今の分析結果をもとに、来週の経営会議で発表するための報告用プレゼンテーションスライドを5枚構成（1.エグゼクティブサマリ、2.月次回収率の推移と課題、3.要注意法人トップ10社の未収状況、4.与信枠見直し・債権保全によるリスク低減シミュレーション、5.今後のアクションプラン）で作成してください。</div>
+                    <div class="prompt-body" id="prompt-s3-step3-canvas">今の分析結果をもとに、来週の経営会議で発表するための報告用プレゼンテーションスライドを5枚構成（1.エグゼクティブサマリ、2.月次回収率の推移と課題、3.要注意法人トップ10社の未収状況、4.今後半年間の将来予測と債権保全シミュレーション、5.今後のアクションプラン）で作成してください。</div>
                 </div>
 
                 <!-- 推奨ドキュメント名コピー（スライド P.33） -->
@@ -1190,7 +1209,7 @@
                 お時間のある方は、気になる部門のエージェントを <code class="inline">@</code> メンションから呼び出し、散布図・円グラフ・ツリーマップ・複合チャート・積み上げ面グラフなど多彩な可視化をお試しください。</p>
 
                 <!-- 応用①：コールセンター分析 -->
-                <h3><span class="material-icons">support_agent</span> 応用体験 ①：🎧 コールセンター分析（<code class="inline">@コールセンター分析</code>）</h3>
+                <h3><span class="material-icons">support_agent</span> 応用体験 ①：🎧 コールセンター分析（<span class="mention-chip">@コールセンター分析</span>）</h3>
                 <p>入電ログ・オペレーター応対履歴・顧客満足度アンケートの3テーブルを掛け合わせ、応対品質と放棄呼のボトルネックを可視化します。</p>
 
                 <div class="prompt-card">
@@ -1203,8 +1222,11 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-bonus-cc1">@コールセンター分析
-オペレーター別の「平均処理時間」と「一次解決率」の相関関係を散布図で描画してください。あわせて、処理時間は短いのに一次解決率や顧客満足度が著しく低い要注意オペレーターを特定してください。</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@コールセンター分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-bonus-cc1">オペレーター別の「平均処理時間」と「一次解決率」の相関関係を散布図で描画してください。あわせて、処理時間は短いのに一次解決率や顧客満足度が著しく低い要注意オペレーターを特定してください。</div>
                 </div>
 
                 <div class="prompt-card secondary">
@@ -1217,12 +1239,15 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-bonus-cc2">@コールセンター分析
-入電ログから、①問い合わせ大分類ごとの入電件数シェアを円グラフで可視化し、②曜日および時間帯ごとの入電件数と放棄呼の発生状況を積み上げ棒グラフで表示して、どの曜日・時間帯にオペレーター増員やWeb自己解決誘導が必要か提案してください。</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@コールセンター分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-bonus-cc2">入電ログから、①問い合わせ大分類ごとの入電件数シェアを円グラフで可視化し、②曜日および時間帯ごとの入電件数と放棄呼の発生状況を積み上げ棒グラフで表示して、どの曜日・時間帯にオペレーター増員やWeb自己解決誘導が必要か提案してください。</div>
                 </div>
 
                 <!-- 応用②：人事・タレント分析 -->
-                <h3><span class="material-icons">groups</span> 応用体験 ②：👥 人事・タレント分析（<code class="inline">@人事・タレント分析</code>）</h3>
+                <h3><span class="material-icons">groups</span> 応用体験 ②：👥 人事・タレント分析（<span class="mention-chip">@人事・タレント分析</span>）</h3>
                 <p>社員マスタ・月次勤怠・エンゲージメント調査の3テーブルを掛け合わせ、残業とエンゲージメント・離職リスクの相関や組織別コスト構造を可視化します。</p>
 
                 <div class="prompt-card">
@@ -1235,8 +1260,11 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-bonus-hr1">@人事・タレント分析
-社員マスタのデータから、「直近6ヶ月平均残業時間」と「エンゲージメント総合スコア」の関係を散布図でプロットしてください。残業が何時間を超えるとエンゲージメントが急落し離職リスクが急増しているか、本部別の傾向とあわせて分析してください。</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@人事・タレント分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-bonus-hr1">社員マスタのデータから、「直近6ヶ月平均残業時間」と「エンゲージメント総合スコア」の関係を散布図でプロットしてください。残業が何時間を超えるとエンゲージメントが急落し離職リスクが急増しているか、本部別の傾向とあわせて分析してください。</div>
                 </div>
 
                 <div class="prompt-card secondary">
@@ -1249,12 +1277,15 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-bonus-hr2">@人事・タレント分析
-月次勤怠データを集計し、2026年4月〜9月の月別の「退職発生人数（棒グラフ）」と「全社平均残業時間（折れ線グラフ）」を1つの複合チャートで描画してください。また、本部×職種ごとの在籍人数と人件費総額をツリーマップで可視化してください。</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@人事・タレント分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-bonus-hr2">月次勤怠データを集計し、2026年4月〜9月の月別の「退職発生人数（棒グラフ）」と「全社平均残業時間（折れ線グラフ）」を1つの複合チャートで描画してください。また、本部×職種ごとの在籍人数と人件費総額をツリーマップで可視化してください。</div>
                 </div>
 
                 <!-- 応用③：営業・マーケROI分析 -->
-                <h3><span class="material-icons">trending_up</span> 応用体験 ③：📈 営業・マーケROI分析（<code class="inline">@営業・マーケROI分析</code>）</h3>
+                <h3><span class="material-icons">trending_up</span> 応用体験 ③：📈 営業・マーケROI分析（<span class="mention-chip">@営業・マーケROI分析</span>）</h3>
                 <p>マーケティング施策・見込み客リード・商談パイプラインの3テーブルを掛け合わせ、広告投資対効果とチャネル別商談推移を可視化します。</p>
 
                 <div class="prompt-card">
@@ -1267,8 +1298,11 @@
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-bonus-sales1">@営業・マーケROI分析
-マーケティング施策について、X軸に「投下費用」、Y軸に「創出商談金額」をとった散布図を描画し、高効率チャネルを特定してください。あわせて、2026年4月〜9月の獲得チャネル種別ごとの商談金額推移を積み上げ面グラフで可視化してください。</div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@営業・マーケROI分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-bonus-sales1">マーケティング施策について、X軸に「投下費用」、Y軸に「創出商談金額」をとった散布図を描画し、高効率チャネルを特定してください。あわせて、2026年4月〜9月の獲得チャネル種別ごとの商談金額推移を積み上げ面グラフで可視化してください。</div>
                 </div>
 
                 <div class="prompt-card secondary">
