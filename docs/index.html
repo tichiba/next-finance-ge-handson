@@ -952,54 +952,65 @@
                 </div>
 
                 <p>大口取引先の<strong>東都ロジスティクス株式会社</strong>から「支払期日を翌月末から翌々月末へ延長してほしい」という特例相談が発生したシチュエーションです。<br>
-                従来は各ツールを個別に探していた<strong>「① 営業からの相談メール」「② 審査部内のチャット履歴」「③ 債権管理・与信規程PDF」</strong>を、Gemini Enterprise のメインチャットから1回の質問で横断検索し、一覧表に整理します。</p>
+                情報がメール・チャット・規程PDFのどこにあるか意識せず、同僚に話しかけるような<strong>短い一言ずつ</strong>で状況を深掘りし、最後に一覧表へ整理させます。</p>
 
-                <h3><span class="material-icons">manage_search</span> Step 2-1：社内情報を一括検索して一覧表に整理</h3>
+                <h3><span class="material-icons">mail_outline</span> Step 2-1：まずは取引先からの相談経緯を聞く</h3>
                 <ol>
                     <li>左メニューの <strong>「新しいチャット」</strong> をクリックしてメインチャット画面に戻ります。</li>
-                    <li>以下のプロンプトをコピーし、チャット入力欄に貼り付けて送信します。</li>
+                    <li>まずは以下の短いプロンプトをコピーして送信し、どんな相談が来ているか確認します。</li>
                 </ol>
 
-                <!-- スライド P.22 掲載プロンプト -->
                 <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
-                            <span class="material-icons">search</span>
-                            メール・チャット・規程PDF 横断検索プロンプト
+                            <span class="material-icons">chat_bubble_outline</span>
+                            ① 取引先からの相談経緯を確認するプロンプト
                         </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s2-slide', this)">
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s2-step1', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s2-slide">大口取引先である「東都ロジスティクス」からの支払期日延長の相談について、営業からの相談メール、審査部の同種相談急増に関するチャット議論、および「債権管理・与信規程PDF」を横断検索してください。その上で、以下の3点を一覧表に自動整理してください。
-① 対象取引先・対象金額・相談経緯
-② 審査部現場の懸念点
-③ 規程上の決裁条件（経営会議付議の基準・与信枠凍結ルール・該当条文）</div>
+                    <div class="prompt-body" id="prompt-s2-step1">東都ロジスティクスから相談が来ている支払期日延長の件、どんな経緯か教えて。</div>
                 </div>
 
-                <!-- 詳細条文・車載IoT回線増設可否指定版プロンプト -->
-                <div class="prompt-card secondary">
+                <h3><span class="material-icons">forum</span> Step 2-2：審査部や現場でどう議論されているか聞く</h3>
+                <p>営業部からの相談メールの内容がわかったら、続けて社内チャットで現場がどう受け止めているかを質問します。</p>
+
+                <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
-                            <span class="material-icons">gavel</span>
-                            詳細版：該当条文と車載IoT回線800回線増設可否まで明記させるプロンプト
+                            <span class="material-icons">groups</span>
+                            ② 審査部・現場の懸念点を確認するプロンプト
                         </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s2-detail', this)">
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s2-step2', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s2-detail">大口契約先「東都ロジスティクス株式会社」からの支払期日延長の相談に関して、営業部のメール報告、審査部・債権管理室のチャット議論、および「通信料金等債権管理および与信運用規程」を横断検索し、以下の項目を一覧表に整理してください。
-1. 対象取引先・契約回線数・月間請求額・今回の要請内容と過去の遅延経緯
-2. 審査部・料金センターが懸念している法人他社および個人回線契約者での類似傾向
-3. 社内規程上の該当条文（第11条・第14条・第18条）、経営会議への付議基準、および必要な債権保全措置（新規車載IoT回線800回線の増設可否を含む）</div>
+                    <div class="prompt-body" id="prompt-s2-step2">この件について、審査部や社内のチャットではどんな懸念が出ている？</div>
+                </div>
+
+                <h3><span class="material-icons">gavel</span> Step 2-3：社内規程と照らし合わせて一覧表にまとめさせる</h3>
+                <p>最後に、社内規程上の決裁基準や新規回線増設の可否を確認し、ここまでの情報とあわせて表に整理させます。</p>
+
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <div class="prompt-label">
+                            <span class="material-icons">table_view</span>
+                            ③ 規程上の決裁条件を確認して表にまとめるプロンプト
+                        </div>
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s2-step3', this)">
+                            <span class="material-icons">content_copy</span> プロンプトをコピー
+                        </button>
+                    </div>
+                    <div class="prompt-body" id="prompt-s2-step3">社内規程だと誰の決裁が必要で、新規回線の増設はどうなる？これまでの経緯・懸念点とあわせて表にまとめて。</div>
                 </div>
 
                 <div class="note">
-                    <strong>📊 横断検索で抽出・整理される重要ファクト：</strong>
+                    <strong>📊 3ステップの対話で抽出・整理される重要ファクト：</strong>
                     <ul style="margin-top:6px; margin-bottom:0;">
-                        <li><strong>対象取引先・経緯</strong>：東都ロジスティクス（契約4,850回線、月間請求額4,800万円、与信ランクC1）。過去6ヶ月間に2回の引落不能・遅延履歴あり。燃料高騰等を理由に30日→60日サイトへの延長を要請。</li>
-                        <li><strong>現場の懸念点</strong>：物流・建設セクターのランクC1/C2法人から同種のサイト延長相談が今月他に6社急増。個人回線でも払込票切替層の未収率が14.8%へ上昇。</li>
-                        <li><strong>規程上の決裁基準</strong>：<strong>第14条</strong>により「月間請求3,000万円以上」かつ「直近6ヶ月遅延2回以上」のため営業本部長決裁は不可、<strong>経営会議への付議・承認が必須</strong>。<strong>第18条</strong>により新規車載IoT回線800回線の増設は<strong>原則全面凍結</strong>、未使用与信枠20%圧縮＋債権保証の付保が必要。</li>
+                        <li><strong>対象取引先・経緯（Step 2-1）</strong>：東都ロジスティクス（契約4,850回線、月間請求額4,800万円、与信ランクC1）。過去6ヶ月間に2回の引落不能・遅延履歴あり。燃料高騰等を理由に30日→60日サイトへの延長を要請。</li>
+                        <li><strong>現場の懸念点（Step 2-2）</strong>：物流・建設セクターのランクC1/C2法人から同種のサイト延長相談が今月他に6社急増。個人回線でも払込票切替層の未収率が14.8%へ上昇。</li>
+                        <li><strong>規程上の決裁基準（Step 2-3）</strong>：<strong>第14条</strong>により「月間請求3,000万円以上」かつ「直近6ヶ月遅延2回以上」のため営業本部長決裁は不可、<strong>経営会議への付議・承認が必須</strong>。<strong>第18条</strong>により新規車載IoT回線800回線の増設は<strong>原則全面凍結</strong>、未使用与信枠20%圧縮＋債権保証の付保が必要。</li>
                     </ul>
                 </div>
 
