@@ -471,21 +471,55 @@
         .url-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             background-color: var(--code-bg);
             padding: 8px 12px;
             border-radius: 6px;
             font-family: 'Roboto Mono', monospace;
             font-size: 12.5px;
-            overflow-x: auto;
             justify-content: space-between;
         }
 
         .url-text {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            word-break: break-all;
+            white-space: normal;
             color: var(--primary-dark);
+            line-height: 1.4;
+        }
+
+        /* Screenshot Grid */
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0 24px;
+            align-items: start;
+        }
+
+        .screenshot-card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: #ffffff;
+            padding: 12px 14px;
+            box-shadow: 0 1px 2px rgba(60,64,67,0.06);
+        }
+
+        .screenshot-caption {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .screenshot-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #eceff1;
+            display: block;
         }
 
         .url-actions {
@@ -623,6 +657,9 @@
             .step-content {
                 padding: 24px 20px;
             }
+            .screenshot-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -717,7 +754,7 @@
                         <tr>
                             <td><strong>シナリオ 1</strong><br>10分</td>
                             <td><strong>【Gemini Notebook】<br>経営戦略・業界動向のインプットと要点整理</strong></td>
-                            <td>①『NTTグループ統合報告書』『NTTファイナンスIR資料』を投入し、日本語の音声概要を生成<br>② 音声生成の待ち時間に、2資料を横断して重点戦略や事業課題をQA<br>③ 完成した日本語対談番組を試聴</td>
+                            <td>①『NTTグループ統合報告書』『NTTファイナンスIR資料』のURLを追加し、スライド資料と音声解説を生成<br>② 生成の待ち時間に、2資料を横断して戦略・財務・事業機会をQA<br>③ 完成したスライド資料の閲覧と音声解説を試聴</td>
                         </tr>
                         <tr>
                             <td><strong>シナリオ 2</strong><br>12分</td>
@@ -766,10 +803,14 @@
                     <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：10分</span>
                 </div>
 
-                <p>統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>日本語の音声概要の自動生成</strong>と、<strong>複数資料を横断した引用付きQA</strong>を体験します。</p>
+                <p>統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>スライド資料・音声解説の自動生成</strong>と、<strong>複数資料を横断した引用付きQA</strong>を体験します。</p>
 
-                <h3><span class="material-icons">folder_open</span> Step 1-1：投入する2つの資料</h3>
-                <p>以下の2つのPDFファイルをダウンロードして Notebook にアップロードするか、公開URLをコピーして追加します。</p>
+                <h3><span class="material-icons">add_link</span> Step 1-1：Notebook の新規作成とソースの追加</h3>
+                <ol>
+                    <li>左メニューから <strong>「Gemini Notebook」</strong> を開き、<strong>［＋ 新規作成］</strong>をクリックします。</li>
+                    <li>ソース追加画面で <strong>「ウェブサイト」</strong> を選択します。</li>
+                    <li>以下の2つの資料の <strong>［URLをコピー］</strong> ボタンをクリックし、URLを貼り付けてソースに追加します。</li>
+                </ol>
 
                 <div class="resource-grid">
                     <!-- 資料①：統合報告書 -->
@@ -780,14 +821,11 @@
                                 資料①：NTTグループ統合報告書 2026（主要12ページ抜粋版）
                                 <span class="badge badge-green">ソース①</span>
                             </div>
-                            <a class="btn-download" href="./files/ntt_group_integrated_report_2026_excerpt.pdf" download="ntt_group_integrated_report_2026_excerpt.pdf">
-                                <span class="material-icons" style="font-size:16px;">download</span> ① 統合報告書PDFをダウンロード
-                            </a>
                         </div>
                         <div class="url-row">
-                            <span class="url-text">https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf</span>
+                            <span class="url-text">https://tichiba.github.io/next-finance-ge-handson/files/ntt_report_2026.pdf</span>
                             <div class="url-actions">
-                                <button class="copy-btn" onclick="copyText('https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf', this)">
+                                <button class="copy-btn" onclick="copyText('https://tichiba.github.io/next-finance-ge-handson/files/ntt_report_2026.pdf', this)">
                                     <span class="material-icons">content_copy</span> URLをコピー
                                 </button>
                             </div>
@@ -802,9 +840,6 @@
                                 資料②：NTTファイナンス 決算・事業財務ハイライト資料
                                 <span class="badge badge-green">ソース②</span>
                             </div>
-                            <a class="btn-download" href="./files/next_finance_ir_highlights_2026.pdf" download="next_finance_ir_highlights_2026.pdf">
-                                <span class="material-icons" style="font-size:16px;">download</span> ② IR資料PDFをダウンロード
-                            </a>
                         </div>
                         <div class="url-row">
                             <span class="url-text">https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf</span>
@@ -817,19 +852,36 @@
                     </div>
                 </div>
 
-                <h3><span class="material-icons">podcasts</span> Step 1-2：Notebook の作成と音声概要の生成開始</h3>
+                <h3><span class="material-icons">auto_awesome</span> Step 1-2：スライド資料と音声解説の生成</h3>
                 <ol>
-                    <li>左メニューから <strong>「Gemini Notebook」</strong> を開き、<strong>［＋ 新規作成］</strong>をクリックします。</li>
-                    <li>ソース追加画面で、ダウンロードした2つのPDFファイルをアップロードします。</li>
-                    <li>画面右側の <strong>Studio パネル</strong> にある <strong>「音声概要」</strong> の編集アイコンをクリックし、以下のプロンプトを貼り付けて <strong>［生成］</strong> を開始します。</li>
+                    <li>画面右側の <strong>Studio パネル</strong> にある <strong>「スライド資料」</strong> カードをクリックします（カスタマイズなしでそのまま生成が始まります）。</li>
+                    <li>続けて、隣の <strong>「音声解説」</strong> カード右上の <strong>「⋮」</strong> をクリックし、<strong>「カスタマイズ」</strong> を選択します。</li>
+                    <li>以下のプロンプトを貼り付けて生成を開始します。</li>
                 </ol>
 
-                <!-- スライド P.16 掲載プロンプト -->
+                <div class="screenshot-grid">
+                    <div class="screenshot-card">
+                        <div class="screenshot-caption">
+                            <span class="material-icons" style="font-size:16px;">touch_app</span>
+                            ①「スライド資料」をクリック ／ ②「音声解説」の「⋮」をクリック
+                        </div>
+                        <img src="./images/studio_panel.png" alt="Studioパネルの操作箇所">
+                    </div>
+                    <div class="screenshot-card">
+                        <div class="screenshot-caption">
+                            <span class="material-icons" style="font-size:16px;">tune</span>
+                            ③「カスタマイズ」をクリックしてプロンプトを入力
+                        </div>
+                        <img src="./images/audio_customize.png" alt="音声解説のカスタマイズ選択">
+                    </div>
+                </div>
+
+                <!-- 音声解説カスタマイズプロンプト（1つに統一） -->
                 <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
                             <span class="material-icons">mic</span>
-                            音声概要のカスタマイズ指示文
+                            音声解説のカスタマイズ用プロンプト
                         </div>
                         <button class="copy-btn" onclick="copyFromElement('prompt-s1-audio-slide', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
@@ -839,56 +891,55 @@
 2. 企画・営業担当者が短時間で要点を把握できるよう、分かりやすい対談形式で解説してください。</div>
                 </div>
 
-                <!-- 詳細ブリーフィング版プロンプト -->
-                <div class="prompt-card secondary">
-                    <div class="prompt-card-header">
-                        <div class="prompt-label">
-                            <span class="material-icons">tune</span>
-                            詳細版：経営企画ブリーフィング仕様の指示文
-                        </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-audio-detail', this)">
-                            <span class="material-icons">content_copy</span> プロンプトをコピー
-                        </button>
-                    </div>
-                    <div class="prompt-body" id="prompt-s1-audio-detail">経営企画ブリーフィングとして日本語で対談してください。グループの中期経営戦略と、それを支えるファイナンス・ビリング事業基盤の強みおよび今後の重点課題について分かりやすく議論してください。</div>
-                </div>
-
                 <h3><span class="material-icons">question_answer</span> Step 1-3：2資料を横断したQA</h3>
-                <p>音声概要が生成されている間に、中央のチャット欄に以下のプロンプトを貼り付けて2つの資料を横断分析します。</p>
+                <p>スライド資料と音声解説が生成されている間に、中央のチャット欄に以下のプロンプトを貼り付けて、さまざまな切り口から2つの資料を横断分析してみましょう。</p>
 
-                <!-- スライド P.17 掲載プロンプト -->
+                <!-- 例①：戦略×役割の整理 -->
                 <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
-                            <span class="material-icons">chat</span>
-                            2資料横断 QA プロンプト
+                            <span class="material-icons">account_tree</span>
+                            例①【戦略×役割の整理】グループ中期戦略とファイナンス事業の役割を紐づける
                         </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-qa-slide', this)">
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-qa-1', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s1-qa-slide">NTTグループの中期経営戦略における金融・決済・ビリング事業の重点戦略と、現在直面している主要な事業課題を2つの資料から横断的に整理してください。</div>
+                    <div class="prompt-body" id="prompt-s1-qa-1">NTTグループの中期経営戦略における重点投資領域を整理した上で、それを支えるNTTファイナンスの各事業（ビリング・クレジットカード・ファイナンス事業）がグループ内でどのような役割を担っているか、2つの資料から横断的に解説してください。</div>
                 </div>
 
-                <!-- 詳細版 QA プロンプト -->
-                <div class="prompt-card secondary">
+                <!-- 例②：財務・数値の表比較 -->
+                <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
-                            <span class="material-icons">fact_check</span>
-                            深掘り版：重点課題を3点に整理して引用根拠を明示させるプロンプト
+                            <span class="material-icons">table_chart</span>
+                            例②【財務・数値の表比較】セグメント別の業績と財務特徴を比較表にまとめる
                         </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-qa-detail', this)">
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-qa-2', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
                         </button>
                     </div>
-                    <div class="prompt-body" id="prompt-s1-qa-detail">アップロードした2つの資料を横断して分析してください。
-中期経営戦略においてファイナンス・ビリング事業が果たすべき役割と、今後の重点課題（ペーパーレス化やAI活用による債権・与信リスク管理の高度化など）を3点に整理し、根拠となる資料の引用付きで教えてください。</div>
+                    <div class="prompt-body" id="prompt-s1-qa-2">決算資料をもとに、NTTファイナンスの直近決算におけるセグメント別（ビリング事業・クレジットカード事業・アカウンティング/ファイナンス事業）の売上・利益動向と財務上の特徴を、比較表にまとめてください。</div>
                 </div>
 
-                <h3><span class="material-icons">headphones</span> Step 1-4：引用箇所の確認と音声概要の試聴</h3>
+                <!-- 例③：企画・壁打ち -->
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <div class="prompt-label">
+                            <span class="material-icons">lightbulb</span>
+                            例③【企画・壁打ち】今後のビジネス機会と事業リスクを3点ずつ抽出する
+                        </div>
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-qa-3', this)">
+                            <span class="material-icons">content_copy</span> プロンプトをコピー
+                        </button>
+                    </div>
+                    <div class="prompt-body" id="prompt-s1-qa-3">2つの資料に記載されている「デジタル化・AI活用」「キャッシュフロー創出」「債権・財務管理」の観点から、今後さらに強化すべきビジネス機会と注意すべき事業リスクをそれぞれ3点ずつ提案してください。</div>
+                </div>
+
+                <h3><span class="material-icons">headphones</span> Step 1-4：引用箇所の確認とスライド・音声解説の確認</h3>
                 <ol>
                     <li>回答内の<strong>引用番号</strong>をクリックすると、元PDFの該当箇所がハイライト表示され、裏付け確認が可能です。</li>
-                    <li>右側 Studio パネルに音声概要が完成したら、<strong>再生ボタン</strong>をクリックして日本語の対談番組を試聴します。</li>
+                    <li>右側 Studio パネルの下部に <strong>スライド資料</strong> と <strong>音声解説</strong> が完成したら、クリックしてスライドの閲覧や日本語対談番組の試聴を行います。</li>
                 </ol>
 
                 <div class="nav-buttons">
