@@ -14,11 +14,21 @@ Gemini Notebook、Gemini Enterprise（社内文書・GWS横断検索 / モデル
 
 ## 🚀 講師・ファシリテーター用：Cloud Shell 自動構築ワンライナー
 
-Qwiklabs（`ユーザー名00` で発行された管理者用 `student-xx-...@qwiklabs.net`）または Argolis 検証環境の **Cloud Shell** を開き、以下のワンライナーを実行すると、本リポジトリから `next-finance-ge-handson-qwiklab.zip` を自動取得・展開して全環境（プロジェクト内の全 `student-xx-...@qwiklabs.net` アカウント自動検出＆IAM権限付与、BigQuery 4データセット・計12テーブル、社内規程データストア、Gemini Enterprise アプリ、4部門 A2A データ分析エージェント）を一括構築します。
+Qwiklabs（`ユーザー名00` で発行された管理者用 `student-xx-...@qwiklabs.net`）または Argolis 検証環境の **Cloud Shell** を開き、以下のワンライナーを実行すると、本リポジトリから `next-finance-ge-handson-qwiklab.zip` を自動取得・展開して全環境を一括構築します：
+
+* プロジェクト内の全 `student-xx-...@qwiklabs.net` アカウント自動検出＆IAM権限・ライセンス付与
+* **Gmail / Google Chat 実データの自動配信**（初回1回の OAuth 認可により、全受講者アカウントの Gmail 受信トレイへ「東都ロジスティクス支払期日延長相談メール」を送信し、Google Chat スペース「【審査部×ビリング債権管理】与信・収納モニタリング連携」を作成して議論メッセージを投稿）
+* **Gmail コネクタ（`google_mail`）・Google Chat コネクタ（`google_chat`）・社内規程 PDF データストア（`next-finance-internal-docs`）** の作成と Gemini Enterprise エンジンへの接続
+* BigQuery 4データセット（計12テーブル）と 4部門 A2A データ分析エージェントの構築・登録
 
 ```bash
 curl -fL -o next-finance-ge-handson-qwiklab.zip https://raw.githubusercontent.com/tichiba/next-finance-ge-handson/main/docs/files/next-finance-ge-handson-qwiklab.zip && unzip -q -o next-finance-ge-handson-qwiklab.zip -d handson && bash handson/tf/scripts/setup.sh
 ```
+
+* **Gmail / Google Chat 実データのみを再投入したい場合**:
+  ```bash
+  python3 handson/tf/scripts/seed_gws_data.py --force
+  ```
 
 ### 全リソース削除（クリーンアップ）コマンド
 

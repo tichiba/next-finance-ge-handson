@@ -92,15 +92,23 @@ done
 sleep 5
 
 # ------------------------------------------------------------------------------
-# 5. Delete Discovery Engine DataStores
+# 5. Delete Discovery Engine DataStores & GWS Connector Collections
 # ------------------------------------------------------------------------------
-echo "[5/7] Deleting Discovery Engine DataStores..."
-for DS_ID in "next-finance-internal-docs" "ntt-finance-internal-docs" "gws-google-drive-ds" "gws-gmail-ds"; do
+echo "[5/7] Deleting Discovery Engine DataStores & GWS Connector Collections..."
+for DS_ID in "next-finance-internal-docs" "ntt-finance-internal-docs" "gws-google-drive-ds" "gws-gmail-ds" "gws-gchat-ds" "gws-gmail-connector_google_mail" "gws-gchat-connector_google_chat"; do
   echo "  -> Deleting DataStore: ${DS_ID} (if exists)"
   curl -s -X DELETE \
     -H "Authorization: Bearer ${TOKEN}" \
     -H "X-Goog-User-Project: ${PROJECT_ID}" \
     "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DS_ID}" >/dev/null || true
+done
+
+for COLL_ID in "gws-gmail-connector" "gws-gchat-connector"; do
+  echo "  -> Deleting GWS Connector Collection: ${COLL_ID} (if exists)"
+  curl -s -X DELETE \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/${COLL_ID}" >/dev/null || true
 done
 
 # ------------------------------------------------------------------------------

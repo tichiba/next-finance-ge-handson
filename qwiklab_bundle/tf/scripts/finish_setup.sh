@@ -11,6 +11,7 @@ BUCKET_NAME="${2:-${PROJECT_ID}-next-finance-handson}"
 ENGINE_ID="next-finance-ge-app"
 DATASTORE_ID="next-finance-internal-docs"
 MODEL_ID="gemini-3.8-flash"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format="value(projectNumber)")
 TOKEN=$(gcloud auth print-access-token)
@@ -58,16 +59,74 @@ curl -s -X PATCH \
   }' >/dev/null || true
 
 # ------------------------------------------------------------------------------
-# 2. Create Unstructured DataStore (Scenario 2 Internal Docs) & Import from GCS
+# 2. Seed Gmail / Google Chat Real Messages & Import Internal Policy PDF to GCS DataStore
 # ------------------------------------------------------------------------------
-echo "[2/6] Creating Internal Docs DataStore (${DATASTORE_ID}) & Importing PDFs..."
+echo "[2/6] Seeding Gmail / Google Chat Real Data & Creating Internal Policy DataStore (${DATASTORE_ID})..."
+
+GWS_TOKEN="${GWS_ACCESS_TOKEN:-}"
+if [ -z "${GWS_TOKEN}" ]; then
+  ADC_TOK=$(gcloud auth application-default print-access-token 2>/dev/null || true)
+  for CANDIDATE_TOK in "${ADC_TOK}" "${TOKEN}"; do
+    if [ -n "${CANDIDATE_TOK}" ]; then
+      SCOPE_INFO=$(curl -s "https://oauth2.googleapis.com/tokeninfo?access_token=${CANDIDATE_TOK}" || true)
+      if echo "${SCOPE_INFO}" | grep -q "gmail" && echo "${SCOPE_INFO}" | grep -q "chat"; then
+        GWS_TOKEN="${CANDIDATE_TOK}"
+        break
+      fi
+    fi
+  done
+fi
+
+if [ -z "${GWS_TOKEN}" ] && [ -t 0 ] && [ -z "${SKIP_GWS_OAUTH:-}" ]; then
+  echo "  ============================================================================"
+  echo "  🔑 [Gmail / Google Chat 実データ投入用 OAuth 認可 (初回1回のみ)]"
+  echo "     全受講者アカウントへ「東都ロジスティクス相談メール」と「審査部Chat議論」を"
+  echo "     実データとして自動配信するため、以下の URL を開いて承認コードを入力してください。"
+  echo "  ============================================================================"
+  gcloud auth application-default login \
+    --scopes="https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/gmail.send,https://www.googleapis.com/auth/gmail.modify,https://www.googleapis.com/auth/gmail.insert,https://www.googleapis.com/auth/chat.spaces,https://www.googleapis.com/auth/chat.memberships,https://www.googleapis.com/auth/chat.messages,https://www.googleapis.com/auth/drive.file" \
+    --no-launch-browser || {
+    echo "  [INFO] Google Chat スコープが制限されている環境のため、Gmail スコープで再試行します..."
+    gcloud auth application-default login \
+      --scopes="https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/gmail.send,https://www.googleapis.com/auth/gmail.modify,https://www.googleapis.com/auth/gmail.insert,https://www.googleapis.com/auth/drive.file" \
+      --no-launch-browser || true
+  }
+  gcloud auth application-default set-quota-project "${PROJECT_ID}" --quiet >/dev/null 2>&1 || true
+  GWS_TOKEN=$(gcloud auth application-default print-access-token 2>/dev/null || echo "${TOKEN}")
+fi
+
+rm -f /tmp/gws_seed_status.json
+if [ -f "${SCRIPT_DIR}/seed_gws_data.py" ] && [ -n "${GWS_TOKEN}" ]; then
+  python3 "${SCRIPT_DIR}/seed_gws_data.py" \
+    --project-id "${PROJECT_ID}" \
+    --token "${GWS_TOKEN}" \
+    --json-output /tmp/gws_seed_status.json || true
+fi
+
+GMAIL_SEEDED=$(python3 -c '
+import json
+try:
+    d = json.load(open("/tmp/gws_seed_status.json"))
+    print("true" if d.get("gmail_seeded") else "false")
+except Exception:
+    print("false")
+')
+CHAT_SEEDED=$(python3 -c '
+import json
+try:
+    d = json.load(open("/tmp/gws_seed_status.json"))
+    print("true" if d.get("chat_seeded") else "false")
+except Exception:
+    print("false")
+')
+
 curl -s -X POST \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -H "X-Goog-User-Project: ${PROJECT_ID}" \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=${DATASTORE_ID}" \
   -d '{
-    "displayName": "ネクストファイナンス 社内規程・営業メール・審査部Chatアーカイブ",
+    "displayName": "ネクストファイナンス 社内規程（通信料金等債権管理および与信運用規程）",
     "industryVertical": "GENERIC",
     "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
     "contentConfig": "CONTENT_REQUIRED",
@@ -78,37 +137,97 @@ curl -s -X POST \
     }
   }' >/dev/null || true
 
+curl -s -X PATCH \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}?updateMask=displayName" \
+  -d '{
+    "displayName": "ネクストファイナンス 社内規程（通信料金等債権管理および与信運用規程）"
+  }' >/dev/null || true
+
 sleep 2
 
-curl -s -X POST \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
-  -d "{
-    \"gcsSource\": {
-      \"inputUris\": [\"gs://${BUCKET_NAME}/scenario2/*.pdf\"],
-      \"dataSchema\": \"content\"
-    },
-    \"reconciliationMode\": \"INCREMENTAL\"
-  }" >/dev/null || true
+if [ "${GMAIL_SEEDED}" = "true" ] || [ "${FORCE_POLICY_ONLY:-}" = "1" ]; then
+  echo "  -> Importing ONLY Credit Policy PDF (next_finance_credit_policy.pdf) into ${DATASTORE_ID} so Gmail & Chat connectors are cited..."
+  curl -s -X POST \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
+    -d "{
+      \"gcsSource\": {
+        \"inputUris\": [\"gs://${BUCKET_NAME}/scenario2/next_finance_credit_policy.pdf\"],
+        \"dataSchema\": \"content\"
+      },
+      \"reconciliationMode\": \"FULL\"
+    }" >/dev/null || true
+
+  # Also explicitly remove next_finance_email_chat_archive.pdf if it was previously imported
+  DOCS_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents?pageSize=100" || true)
+  ARCHIVE_DOC_NAMES=$(python3 -c "
+import json
+try:
+    d = json.loads('''${DOCS_JSON}''')
+    for doc in d.get('documents', []):
+        uri = doc.get('content', {}).get('uri', '')
+        if 'next_finance_email_chat_archive' in uri or 'email_chat_archive' in json.dumps(doc):
+            print(doc['name'])
+except Exception:
+    pass
+")
+  for DOC_NAME in ${ARCHIVE_DOC_NAMES}; do
+    curl -s -X DELETE \
+      -H "Authorization: Bearer ${TOKEN}" \
+      -H "X-Goog-User-Project: ${PROJECT_ID}" \
+      "https://discoveryengine.googleapis.com/v1alpha/${DOC_NAME}" >/dev/null || true
+  done
+else
+  echo "  -> [Fallback] GWS real data not seeded yet; importing scenario2/*.pdf into ${DATASTORE_ID}..."
+  curl -s -X POST \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
+    -d "{
+      \"gcsSource\": {
+        \"inputUris\": [\"gs://${BUCKET_NAME}/scenario2/*.pdf\"],
+        \"dataSchema\": \"content\"
+      },
+      \"reconciliationMode\": \"INCREMENTAL\"
+    }" >/dev/null || true
+fi
 
 # ------------------------------------------------------------------------------
-# 3. Register Google Workspace Federated DataStores (Drive & Gmail)
+# 3. Register Google Workspace Connectors & DataStores (Gmail & Google Chat)
 # ------------------------------------------------------------------------------
-echo "[3/6] Registering Google Workspace Federated DataStores (Drive / Gmail)..."
+echo "[3/6] Registering Google Workspace Federated Connectors (Gmail & Google Chat)..."
+
+# Remove legacy Google Drive datastore if present so only Gmail, Google Chat, and Internal Policy PDF are used
+curl -s -X DELETE \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/gws-google-drive-ds" >/dev/null 2>&1 || true
+
+# 3a. Set up V2 Federated DataConnectors for Gmail (google_mail) and Google Chat (google_chat)
 curl -s -X POST \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=gws-google-drive-ds" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global:setUpDataConnector" \
   -d '{
-    "displayName": "Google Drive (GWS 横断検索)",
-    "industryVertical": "GENERIC",
-    "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
-    "contentConfig": "GOOGLE_WORKSPACE",
-    "workspaceConfig": {
-      "type": "GOOGLE_DRIVE"
+    "collectionId": "gws-gmail-connector",
+    "collectionDisplayName": "Gmail (GWS 横断検索)",
+    "dataConnector": {
+      "dataSource": "google_mail",
+      "entities": [
+        {
+          "entityName": "google_mail"
+        }
+      ],
+      "connectorModes": ["FEDERATED"],
+      "aclEnabled": true
     }
   }' >/dev/null || true
 
@@ -116,16 +235,113 @@ curl -s -X POST \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=gws-gmail-ds" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global:setUpDataConnector" \
   -d '{
-    "displayName": "Gmail (GWS 横断検索)",
-    "industryVertical": "GENERIC",
-    "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
-    "contentConfig": "GOOGLE_WORKSPACE",
-    "workspaceConfig": {
-      "type": "GOOGLE_MAIL"
+    "collectionId": "gws-gchat-connector",
+    "collectionDisplayName": "Google Chat (GWS 横断検索)",
+    "dataConnector": {
+      "dataSource": "google_chat",
+      "entities": [
+        {
+          "entityName": "google_chat"
+        }
+      ],
+      "connectorModes": ["FEDERATED"],
+      "aclEnabled": true
     }
   }' >/dev/null || true
+
+sleep 3
+
+# 3b. Ensure Workspace DataStores exist in default_collection for both GOOGLE_MAIL and GOOGLE_CHAT
+DS_CHECK_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores")
+
+NEED_FALLBACK_DS=$(python3 -c "
+import json
+try:
+    data = json.loads('''${DS_CHECK_JSON}''')
+    has_mail = False
+    has_chat = False
+    has_conn_mail = False
+    has_conn_chat = False
+    for d in data.get('dataStores', []):
+        ds_id = d.get('name', '').split('/')[-1]
+        w_type = d.get('workspaceConfig', {}).get('type', '')
+        c_type = d.get('connectorConfig', {}).get('connectorType', '')
+        if w_type == 'GOOGLE_MAIL' or c_type == 'GOOGLE_MAIL' or 'google_mail' in ds_id:
+            has_mail = True
+            if d.get('connectorName') or 'gws-gmail-connector' in ds_id:
+                has_conn_mail = True
+        if w_type == 'GOOGLE_CHAT' or c_type == 'GOOGLE_CHAT' or 'google_chat' in ds_id:
+            has_chat = True
+            if d.get('connectorName') or 'gws-gchat-connector' in ds_id:
+                has_conn_chat = True
+    out = []
+    if not has_mail:
+        out.append('CREATE_MAIL')
+    elif has_conn_mail:
+        out.append('CLEAN_LEGACY_MAIL')
+    if not has_chat:
+        out.append('CREATE_CHAT')
+    elif has_conn_chat:
+        out.append('CLEAN_LEGACY_CHAT')
+    print(' '.join(out))
+except Exception:
+    print('CREATE_MAIL CREATE_CHAT')
+")
+
+if [[ "${NEED_FALLBACK_DS}" == *"CLEAN_LEGACY_MAIL"* ]]; then
+  curl -s -X DELETE \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/gws-gmail-ds" >/dev/null 2>&1 || true
+fi
+
+if [[ "${NEED_FALLBACK_DS}" == *"CLEAN_LEGACY_CHAT"* ]]; then
+  curl -s -X DELETE \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/gws-gchat-ds" >/dev/null 2>&1 || true
+fi
+
+if [[ "${NEED_FALLBACK_DS}" == *"CREATE_MAIL"* ]]; then
+  curl -s -X POST \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=gws-gmail-ds" \
+    -d '{
+      "displayName": "Gmail (GWS 横断検索)",
+      "industryVertical": "GENERIC",
+      "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
+      "contentConfig": "GOOGLE_WORKSPACE",
+      "aclEnabled": true,
+      "workspaceConfig": {
+        "type": "GOOGLE_MAIL"
+      }
+    }' >/dev/null || true
+fi
+
+if [[ "${NEED_FALLBACK_DS}" == *"CREATE_CHAT"* ]]; then
+  curl -s -X POST \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=gws-gchat-ds" \
+    -d '{
+      "displayName": "Google Chat (GWS 横断検索)",
+      "industryVertical": "GENERIC",
+      "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
+      "contentConfig": "GOOGLE_WORKSPACE",
+      "aclEnabled": true,
+      "workspaceConfig": {
+        "type": "GOOGLE_CHAT"
+      }
+    }' >/dev/null || true
+fi
+
+sleep 2
 
 DS_LIST_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores")
@@ -134,18 +350,23 @@ DS_ARRAY=$(python3 -c "
 import json
 try:
     data = json.loads('''${DS_LIST_JSON}''')
-    ids = [d['name'].split('/')[-1] for d in data.get('dataStores', [])]
-    if not ids:
-        ids = ['${DATASTORE_ID}']
+    ids = [
+        d['name'].split('/')[-1]
+        for d in data.get('dataStores', [])
+        if d['name'].split('/')[-1] != 'gws-google-drive-ds'
+    ]
+    if '${DATASTORE_ID}' not in ids:
+        ids.insert(0, '${DATASTORE_ID}')
     print(json.dumps(ids))
 except Exception:
-    print('[\"${DATASTORE_ID}\"]')
+    print('[\"${DATASTORE_ID}\", \"gws-gmail-ds\", \"gws-gchat-ds\"]')
 ")
+echo "  -> Linked DataStores for Engine (${ENGINE_ID}): ${DS_ARRAY}"
 
 # ------------------------------------------------------------------------------
 # 4. Create Gemini Enterprise (Agentspace) Engine & Configure gemini-3.8-flash
 # ------------------------------------------------------------------------------
-echo "[4/6] Creating Gemini Enterprise Engine (${ENGINE_ID}) with model ${MODEL_ID}..."
+echo "[4/6] Creating/Updating Gemini Enterprise Engine (${ENGINE_ID}) with model ${MODEL_ID}..."
 curl -s -X POST \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
@@ -167,6 +388,16 @@ curl -s -X POST \
   }" >/dev/null || true
 
 sleep 3
+
+# Ensure existing Engine also has the updated dataStoreIds (Gmail + Google Chat + Internal Docs)
+curl -s -X PATCH \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}?updateMask=dataStoreIds" \
+  -d "{
+    \"dataStoreIds\": ${DS_ARRAY}
+  }" >/dev/null || true
 
 # Explicitly enable and set gemini-3.8-flash on the Engine WidgetConfig
 curl -s -X PATCH \
@@ -900,16 +1131,23 @@ echo "    - next_finance_3db_agent        : 請求・入金・与信分析"
 echo "    - next_finance_callcenter_agent : コールセンター分析"
 echo "    - next_finance_hr_agent         : 人事・タレント分析"
 echo "    - next_finance_sales_agent      : 営業・マーケROI分析"
-echo " 4. シナリオ1用 高速抜粋版 IR 資料 PDF ダウンロード URL :"
+echo " 4. シナリオ2 横断検索データソース ＆ Gmail / Google Chat 実データ投入状況 :"
+echo "    - 接続済データストア一覧 : ${DS_ARRAY}"
+echo "    - Gmail 実メール配信     : ${GMAIL_SEEDED:-false} (東都ロジスティクス支払期日延長相談スレッド)"
+echo "    - Google Chat 実スペース : ${CHAT_SEEDED:-false} (【審査部×ビリング債権管理】与信・収納モニタリング連携)"
+echo "    - 社内規程 PDF データストア: ${DATASTORE_ID} (通信料金等債権管理および与信運用規程)"
+echo "    - 実データ再投入コマンド : python3 handson/tf/scripts/seed_gws_data.py --project-id ${PROJECT_ID} --force"
+echo " 5. シナリオ1用 高速抜粋版 IR 資料 PDF ダウンロード URL :"
 echo "    - ① NTTグループ統合報告書2026(公式12P高速抜粋・1.5MB): https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf"
 echo "    - ② NTTファイナンス決算資料(公式・106KB)             : https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf"
 echo "    - ③ IR事業ハイライト・重点課題まとめ(2P・588KB)      : https://tichiba.github.io/next-finance-ge-handson/files/next_finance_ir_highlights_2026.pdf"
-echo " 5. Gemini Enterprise Web App / 管理画面 URL (Model: ${MODEL_ID}) :"
+echo " 6. Gemini Enterprise Web App / 管理画面 URL (Model: ${MODEL_ID}) :"
 if [ -n "${CID}" ]; then
   echo "    - Web App 直接URL : https://vertexaisearch.cloud.google.com/home/cid/${CID}"
   echo "    - Codelab (CID付) : https://tichiba.github.io/next-finance-ge-handson/?cid=${CID}"
 fi
 echo "    - Console 管理画面: https://console.cloud.google.com/ai/agentspace/locations/global/engines/${ENGINE_ID}/overview?project=${PROJECT_ID}"
-echo " 6. 全リソース削除（クリーンアップ）コマンド :"
+echo " 7. 全リソース削除（クリーンアップ）コマンド :"
 echo "    bash handson/tf/scripts/cleanup.sh ${PROJECT_ID}"
 echo "=============================================================================="
+rm -f /tmp/gws_seed_status.json

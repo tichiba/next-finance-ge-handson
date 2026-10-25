@@ -52,7 +52,7 @@ unzip -q -o next-finance-ge-handson-qwiklab.zip -d handson && bash handson/tf/sc
 | **1. API 有効化・ライセンス構成** | `discoveryengine`、`geminidataanalytics`、`bigquery` 等のAPI有効化、および全ユーザーの Gemini Enterprise ライセンス自動割当設定 |
 | **2. Cloud Storage 資料配置** | `gs://<PROJECT_ID>-next-finance-handson` を作成し、シナリオ1用 IR PDF（2点）、シナリオ2用 社内規程・メール・Chat履歴 PDF（2点）、および全4データセットのCSV・スキーマ一式をアップロード |
 | **3. BigQuery 4データセット（計12テーブル）作成** | ① `next_finance_handson`（請求・入金・与信）<br>② `next_finance_callcenter`（コールセンター入電ログ・オペレーター・CSATアンケート）<br>③ `next_finance_hr`（社員マスタ・月次勤怠・エンゲージメントサーベイ）<br>④ `next_finance_sales_mktg`（マーケティング施策・見込み客リード・商談パイプライン） |
-| **4. 社内文書データストア＆GWS連携** | 社内文書データストア（`next-finance-internal-docs`）を作成してGCSからシナリオ2用PDFを自動インポートし、Google Drive / Gmail コネクタを登録 |
+| **4. 社内規程データストア＆Gmail/Chatコネクタ＋実データ投入** | 講師アカウントでの初回1回 OAuth 認可により、全受講者へ「東都ロジスティクス相談メール（Gmail）」と「審査部・債権管理室スペース議論（Google Chat）」の実データを一括配信。さらに社内規程データストア（`next-finance-internal-docs`：規程PDFのみ）を作成し、**Gmail コネクタ（`google_mail`）・Google Chat コネクタ（`google_chat`）** を Gemini Enterprise に接続 |
 | **5. Gemini Enterprise エンジン** | アプリ `ネクストファイナンス Gemini Enterprise ハンズオン`（`next-finance-ge-app`）を作成し、既定モデルに **`gemini-3.8-flash`** を設定してデータストアを紐付け |
 | **6. 4種の A2A データ分析エージェント** | BigQuery Conversational Analytics 上に4つの部門別データエージェント（財務与信 / コールセンターVOC / 人事タレント / 営業マーケROI）を作成・公開し、Gemini Enterprise へ一括登録 |
 

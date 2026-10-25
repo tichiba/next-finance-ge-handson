@@ -21,7 +21,7 @@ gcloud config set project "${PROJECT_ID}"
 # ------------------------------------------------------------------------------
 # 1. Enable Required Google Cloud APIs
 # ------------------------------------------------------------------------------
-echo "[STEP 1] Enabling required Google Cloud APIs..."
+echo "[STEP 1] Enabling required Google Cloud & Google Workspace APIs..."
 gcloud services enable \
   bigquery.googleapis.com \
   storage.googleapis.com \
@@ -31,7 +31,11 @@ gcloud services enable \
   dataplex.googleapis.com \
   aiplatform.googleapis.com \
   cloudresourcemanager.googleapis.com \
-  iam.googleapis.com --project="${PROJECT_ID}"
+  iam.googleapis.com \
+  gmail.googleapis.com \
+  chat.googleapis.com \
+  people.googleapis.com \
+  admin.googleapis.com --project="${PROJECT_ID}"
 
 PROJECT_NUMBER=$(gcloud projects describe "${PROJECT_ID}" --format="value(projectNumber)")
 echo "[INFO] Project Number: ${PROJECT_NUMBER}"
@@ -49,6 +53,9 @@ gsutil -m cp "${DATA_DIR}/scenario4_callcenter/"* "gs://${BUCKET_NAME}/scenario4
 gsutil -m cp "${DATA_DIR}/scenario5_hr/"* "gs://${BUCKET_NAME}/scenario5_hr/"
 gsutil -m cp "${DATA_DIR}/scenario6_sales_mktg/"* "gs://${BUCKET_NAME}/scenario6_sales_mktg/"
 gsutil cp "${SCRIPT_DIR}/finish_setup.sh" "gs://${BUCKET_NAME}/scripts/finish_setup.sh"
+if [ -f "${SCRIPT_DIR}/seed_gws_data.py" ]; then
+  gsutil cp "${SCRIPT_DIR}/seed_gws_data.py" "gs://${BUCKET_NAME}/scripts/seed_gws_data.py"
+fi
 if [ -f "${SCRIPT_DIR}/cleanup.sh" ]; then
   gsutil cp "${SCRIPT_DIR}/cleanup.sh" "gs://${BUCKET_NAME}/scripts/cleanup.sh"
 fi
