@@ -79,21 +79,35 @@ EMAIL_BODY_2 = """法人営業第一部 佐藤課長
 
 CHAT_MESSAGES = [
     (
-        "💬 **審査部 第一課長 山本 裕介 (2026年10月3日 11:10)**\n"
-        "「法人営業第一部の佐藤課長から相談が来た『東都ロジスティクス株式会社（Toto Logistics）』（契約者ID：CUST-1042 / 計4,850回線・月間請求約4,800万円［通信・NW費3,100万円、車載端末割賦・合算分1,700万円］・現行与信限度額6,000万円）の支払期日延長（翌月末30日サイト→翌々月末60日サイト化）の件ですが、"
-        "同社は直近6ヶ月（2026年5月・8月）で口座振替不能による入金遅延（5〜8日遅延）が計2回あり、与信ランクが『C1（要注意）』に下がっています。\n"
-        "実は今月に入って、同じ『物流・運輸セクター』や『建設・不動産セクター』の多回線一括契約先（ランクC1〜C2）から、燃料費高騰や荷主回収サイト長期化を理由とした同種の支払サイト延長・分割払いの相談が他に6社も相次いでいます。」"
+        "お疲れ様です、審査部の山本です。\n"
+        "法人営業第一部の佐藤課長から、大口契約先の「東都ロジスティクス株式会社（Toto Logistics）」様について、"
+        "10月・11月請求分の支払期日を翌月末（30日サイト）から翌々月末（60日サイト）へ延長したいとの相談メールが来ました。\n\n"
+        "・契約者ID：CUST-1042（計4,850回線 / 現行与信限度額：月間6,000万円）\n"
+        "・直近の月間請求額：約4,800万円（通信・NW費 3,100万円、車載端末割賦・合算分 1,700万円）\n"
+        "・遅延履歴：直近6ヶ月（2026年5月・8月）に口座振替不能による入金遅延（5〜8日遅れ）が計2回あり、与信ランクは「C1（要注意）」\n\n"
+        "実は今月に入って、同じ物流・運輸セクターや建設・不動産セクターの多回線一括契約先（ランクC1〜C2）から、"
+        "燃料費高騰や荷主回収サイト長期化を理由にした同種の支払サイト延長・分割払いの相談が他に6社も相次いでおり、かなり警戒が必要です。"
     ),
     (
-        "💬 **ビリング事業本部 料金センター 高橋 誠 (2026年10月3日 11:22)**\n"
-        "「法人大口だけでなく、大多数の請求先である『個人の回線契約者（モバイル・光・おまとめ請求）』側でも要注意トレンドが出ています。\n"
-        "口座振替・クレジットカード正常決済層は収納率99.7%と健全ですが、初回口座振替不能でコンビニ払込票（紙請求書）に切り替わった与信ランクC1/C2層（特に電話料金合算サービスを上限近く利用している層）で期日超過・未収率が 14.8% に急上昇しており、払込票の再発行郵送費と督促稼働が現場を圧迫しています。」"
+        "あわせて料金センターの高橋さんとも足元の収納状況を確認したのですが、"
+        "法人大口だけでなく「個人の回線契約者（モバイル・光・おまとめ請求）」側でも要注意トレンドが出ています。\n\n"
+        "・口座振替／クレジットカード正常決済層：収納率 99.7% と健全\n"
+        "・初回口座振替不能でコンビニ払込票（紙請求書）に切り替わった与信ランクC1/C2層："
+        "期日超過・未収率が 14.8% に急上昇（特に電話料金合算サービスを上限近く利用している層）\n\n"
+        "払込票の再発行郵送費と督促稼働が現場をかなり圧迫しているとのことでした。"
     ),
     (
-        "💬 **債権管理室 主任 渡辺 彩 (2026年10月3日 11:30)**\n"
-        "「『通信料金等債権管理および与信運用規程』の第11条・第14条・第18条を確認しました。\n"
-        "東都ロジスティクス社（月間3,000万円以上 かつ 直近6ヶ月で遅延2回のランクC1）の支払期日延長は、第14条により営業本部長決裁は不可で『審査部長およびビリング事業本部長の合議の上、経営会議（またはリスク管理委員会）への付議・承認』が必須です。\n"
-        "さらに第18条により、支払猶予申請を受理した時点で『来期予定されている車載IoT回線800回線の追加増設・割賦枠拡大は全面凍結』し、『与信限度額の20%圧縮（月間6,000万円→4,800万円）』および『前受保証金（月間請求額1ヶ月分以上）またはファクタリング（売掛債権保証60%以上）付保』を経営会議付議の前提条件とする必要があります。」"
+        "債権管理室の渡辺さんとも『通信料金等債権管理および与信運用規程』（第11条・第14条・第18条）を照合しました。"
+        "東都ロジスティクス社の件は以下の対応が必須になります。\n\n"
+        "1. 決裁権限（第14条）：\n"
+        "   月間3,000万円以上 かつ 直近6ヶ月で遅延2回（ランクC1）のため、営業本部長決裁は不可。"
+        "審査部長およびビリング事業本部長の合議の上、「経営会議（またはリスク管理委員会）への付議・承認」が必須\n"
+        "2. 新規増設案件の凍結（第18条①）：\n"
+        "   来期予定されている「車載IoT回線 800回線」の追加増設・割賦枠拡大は全面凍結\n"
+        "3. 与信枠圧縮と債権保全（第18条②③）：\n"
+        "   与信限度額を20%圧縮（月間6,000万円→4,800万円）し、前受保証金（月間請求額1ヶ月分以上）"
+        "またはファクタリング（売掛債権保証60%以上）の付保を経営会議付議の前提条件とする\n\n"
+        "佐藤課長への返信メールにも上記を記載して共有しておきます。"
     ),
 ]
 
@@ -555,21 +569,88 @@ def seed_google_chat(
       pass
 
   # Check if messages already exist in the space when reusing an existing space
-  if not created_new_space and not force:
+  existing_msgs = []
+  if not created_new_space:
     try:
       msgs_resp = api_request(
-          f"https://chat.googleapis.com/v1/{space_name}/messages?pageSize=20",
+          f"https://chat.googleapis.com/v1/{space_name}/messages?pageSize=50",
           token,
           project_id,
       )
-      existing_msgs = msgs_resp.get("messages", [])
-      if any("CUST-1042" in m.get("text", "") for m in existing_msgs):
-        return (
-            True,
-            f"Google Chat space '{CHAT_SPACE_DISPLAY_NAME}' ({space_name}) already has CUST-1042 messages (newly added members: {added_members}).",
-        )
+      existing_msgs = sorted(
+          msgs_resp.get("messages", []),
+          key=lambda m: m.get("createTime", ""),
+      )
     except Exception:
-      pass
+      existing_msgs = []
+
+    has_legacy_script_format = any(
+        "💬" in m.get("text", "") for m in existing_msgs
+    )
+    has_cust_1042 = any(
+        "CUST-1042" in m.get("text", "") for m in existing_msgs
+    )
+    if has_cust_1042 and not has_legacy_script_format and not force:
+      return (
+          True,
+          f"Google Chat space '{CHAT_SPACE_DISPLAY_NAME}' ({space_name}) already has natural CUST-1042 messages (newly added members: {added_members}).",
+      )
+
+  # If existing messages exist (and either --force or legacy 💬 format detected), update in-place first
+  if existing_msgs:
+    updated_count = 0
+    for idx, msg_text in enumerate(CHAT_MESSAGES):
+      if idx < len(existing_msgs):
+        msg_name = existing_msgs[idx].get("name", "")
+        if msg_name:
+          try:
+            api_request(
+                f"https://chat.googleapis.com/v1/{msg_name}?updateMask=text",
+                token,
+                project_id,
+                method="PATCH",
+                payload={"text": msg_text},
+            )
+            updated_count += 1
+            time.sleep(0.3)
+            continue
+          except Exception:
+            pass
+      # If fewer existing messages or PATCH failed, create new message
+      try:
+        api_request(
+            f"https://chat.googleapis.com/v1/{space_name}/messages",
+            token,
+            project_id,
+            method="POST",
+            payload={"text": msg_text},
+        )
+        updated_count += 1
+        time.sleep(0.3)
+      except Exception as e:
+        return (
+            updated_count > 0,
+            f"Updated/posted {updated_count}/{len(CHAT_MESSAGES)} messages in {space_name}; error: {e}",
+        )
+
+    # Remove any extra messages beyond len(CHAT_MESSAGES)
+    for extra_msg in existing_msgs[len(CHAT_MESSAGES) :]:
+      extra_name = extra_msg.get("name", "")
+      if extra_name:
+        try:
+          api_request(
+              f"https://chat.googleapis.com/v1/{extra_name}",
+              token,
+              project_id,
+              method="DELETE",
+          )
+        except Exception:
+          pass
+
+    return (
+        True,
+        f"Updated {updated_count} messages in-place in space '{CHAT_SPACE_DISPLAY_NAME}' ({space_name}), invited {len(other_users)} lab accounts.",
+    )
 
   posted_count = 0
   for msg_text in CHAT_MESSAGES:
