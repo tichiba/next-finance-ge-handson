@@ -4,8 +4,8 @@ Gemini Notebook、Gemini Enterprise（社内文書・GWS横断検索 / モデル
 
 ## 🔗 クイックリンク
 
-* **ハンズオン Codelab Web ページ（GitHub Pages）**:
-  * https://tichiba.github.io/next-finance-ge-handson/
+* **受講者用 Codelab Web ページ**:
+  * **https://goo.gle/ntt-gemini** （実体： https://tichiba.github.io/next-finance-ge-handson/ ）
 * **環境構築バンドル ZIP 直リンク（`next-finance-ge-handson-qwiklab.zip`）**:
   * [GitHub Pages からダウンロード](https://tichiba.github.io/next-finance-ge-handson/files/next-finance-ge-handson-qwiklab.zip)
   * [GitHub Raw からダウンロード](https://raw.githubusercontent.com/tichiba/next-finance-ge-handson/main/docs/files/next-finance-ge-handson-qwiklab.zip)
@@ -28,6 +28,10 @@ curl -fL -o next-finance-ge-handson-qwiklab.zip https://raw.githubusercontent.co
 * **Gmail / Google Chat 実データのみを再投入したい場合**:
   ```bash
   python3 handson/tf/scripts/seed_gws_data.py --force
+  ```
+* **Google Chat メッセージのみを再投入・インプレース更新したい場合**:
+  ```bash
+  python3 handson/tf/scripts/seed_gws_data.py --chat-only --force
   ```
 
 ### 全リソース削除（クリーンアップ）コマンド
