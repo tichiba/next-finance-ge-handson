@@ -297,12 +297,121 @@ def seed_gmail(
   )
 
 
+def get_project_number(project_id: str) -> str:
+  if not project_id:
+    return ""
+  try:
+    out = subprocess.check_output(
+        [
+            "gcloud",
+            "projects",
+            "describe",
+            project_id,
+            "--format=value(projectNumber)",
+        ],
+        stderr=subprocess.DEVNULL,
+        text=True,
+    ).strip()
+    if out:
+      return out
+  except Exception:
+    pass
+  return ""
+
+
+def try_auto_configure_chat_app(token: str, project_id: str) -> bool:
+  """Attempt to auto-configure the Google Chat app via Workspace Add-ons API."""
+  project_number = get_project_number(project_id)
+  targets = [t for t in [project_number, project_id] if t]
+  payload = {
+      "displayName": "Next Finance Bot",
+      "description": "Next Finance Hands-on Helper",
+      "avatarUri": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ac/512.png",
+  }
+  for target in targets:
+    url = (
+        f"https://gsuiteaddons.googleapis.com/v1/projects/{target}/chatAppConfig"
+        "?updateMask=displayName,description,avatarUri"
+    )
+    try:
+      api_request(url, token, project_id, method="PATCH", payload=payload)
+      return True
+    except Exception:
+      continue
+  return False
+
+
+def _create_chat_space_once(
+    token: str,
+    project_id: str,
+    other_users: list[str],
+) -> str:
+  """Create the hands-on Google Chat space, raising HTTPError on 404 app-not-found."""
+  setup_memberships = [
+      {
+          "member": {
+              "name": f"users/{u}",
+              "type": "HUMAN",
+          }
+      }
+      for u in other_users
+  ]
+  setup_payload: dict = {
+      "space": {
+          "spaceType": "SPACE",
+          "displayName": CHAT_SPACE_DISPLAY_NAME,
+      },
+  }
+  if setup_memberships:
+    setup_payload["memberships"] = setup_memberships
+
+  try:
+    sp_res = api_request(
+        "https://chat.googleapis.com/v1/spaces:setup",
+        token,
+        project_id,
+        method="POST",
+        payload=setup_payload,
+    )
+    space_name = sp_res.get("name", "")
+    if space_name:
+      return space_name
+  except urllib.error.HTTPError as e:
+    err_body = e.read().decode("utf-8", errors="ignore")
+    if e.code == 404 and "Google Chat app not found" in err_body:
+      raise RuntimeError(f"CHAT_APP_NOT_CONFIGURED:{err_body}") from e
+  except Exception:
+    pass
+
+  # Fallback: create space via POST /v1/spaces without memberships, then add members separately
+  try:
+    sp_res = api_request(
+        "https://chat.googleapis.com/v1/spaces",
+        token,
+        project_id,
+        method="POST",
+        payload={
+            "spaceType": "SPACE",
+            "displayName": CHAT_SPACE_DISPLAY_NAME,
+        },
+    )
+    return sp_res.get("name", "")
+  except urllib.error.HTTPError as e:
+    err_body = e.read().decode("utf-8", errors="ignore")
+    if e.code == 404 and "Google Chat app not found" in err_body:
+      raise RuntimeError(f"CHAT_APP_NOT_CONFIGURED:{err_body}") from e
+    raise RuntimeError(
+        f"Google Chat space creation failed (HTTP {e.code}): {err_body[:240]}"
+    ) from e
+
+
 def seed_google_chat(
     token: str,
     project_id: str,
     recipients: list[str],
     sender_email: str = "",
     force: bool = False,
+    interactive: bool = True,
 ) -> tuple[bool, str]:
   space_name = ""
   try:
@@ -329,57 +438,98 @@ def seed_google_chat(
 
   created_new_space = False
   if not space_name:
-    # First attempt spaces:setup with memberships
-    setup_memberships = [
-        {
-            "member": {
-                "name": f"users/{u}",
-                "type": "HUMAN",
-            }
-        }
-        for u in other_users
-    ]
-    setup_payload = {
-        "space": {
-            "spaceType": "SPACE",
-            "displayName": CHAT_SPACE_DISPLAY_NAME,
-            "externalUserAllowed": True,
-        },
-    }
-    if setup_memberships:
-      setup_payload["memberships"] = setup_memberships
-
     try:
-      sp_res = api_request(
-          "https://chat.googleapis.com/v1/spaces:setup",
-          token,
-          project_id,
-          method="POST",
-          payload=setup_payload,
-      )
-      space_name = sp_res.get("name", "")
+      space_name = _create_chat_space_once(token, project_id, other_users)
       created_new_space = True
-    except Exception:
-      # Fallback: create space first, then add members one by one
-      try:
-        sp_res = api_request(
-            "https://chat.googleapis.com/v1/spaces",
-            token,
-            project_id,
-            method="POST",
-            payload={
-                "spaceType": "SPACE",
-                "displayName": CHAT_SPACE_DISPLAY_NAME,
-                "externalUserAllowed": True,
-            },
-        )
-        space_name = sp_res.get("name", "")
-        created_new_space = True
-      except urllib.error.HTTPError as e:
-        err_body = e.read().decode("utf-8", errors="ignore")
-        return False, f"Google Chat space creation failed (HTTP {e.code}): {err_body[:240]}"
-      except Exception as e:
-        return False, f"Google Chat space creation error: {e}"
+    except RuntimeError as err:
+      err_str = str(err)
+      if err_str.startswith("CHAT_APP_NOT_CONFIGURED:"):
+        # Step 1: Attempt automatic configuration via Workspace Add-ons API
+        if try_auto_configure_chat_app(token, project_id):
+          time.sleep(2)
+          try:
+            space_name = _create_chat_space_once(token, project_id, other_users)
+            created_new_space = True
+          except Exception:
+            space_name = ""
+
+        # Step 2: If still not configured and running in interactive terminal, guide and poll
+        if not space_name and interactive and sys.stdin.isatty():
+          console_url = (
+              "https://console.cloud.google.com/apis/api/chat.googleapis.com/"
+              f"hangouts-chat?project={project_id}"
+          )
+          print(
+              "\n  ============================================================================"
+          )
+          print(
+              "  💬 [Google Chat API 初期構成の保存（初回1回・約20秒）]"
+          )
+          print(
+              "     新規プロジェクトで Google Chat スペースを作成するため、"
+          )
+          print(
+              "     以下の Cloud Console 直リンクを開き、最小設定を [保存] してください。"
+          )
+          print("")
+          print(f"     👉 直リンク: {console_url}")
+          print("")
+          print("     【入力値（コピー＆ペースト用）】")
+          print("       ・アプリ名 (App name)       : Next Finance Bot")
+          print(
+              "       ・アバターのURL (Avatar URL): https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ac/512.png"
+          )
+          print("       ・説明 (Description)        : Next Finance Hands-on")
+          print(
+              "       ・機能 / 接続設定           : 「インタラクティブ機能を有効にする」のチェックを外す"
+          )
+          print(
+              "                                     （外せない場合は HTTP エンドポイント URL に https://example.com を入力）"
+          )
+          print("")
+          print(
+              "     ⏳ コンソールで [保存 (Save)] をクリックすると自動検知して再開します（最大3分待機 / スキップは Ctrl+C）..."
+          )
+          print(
+              "  ============================================================================"
+          )
+          try:
+            for attempt in range(1, 46):
+              time.sleep(4)
+              try:
+                space_name = _create_chat_space_once(
+                    token, project_id, other_users
+                )
+                if space_name:
+                  created_new_space = True
+                  print(
+                      "  -> [検知成功] Google Chat API 構成の保存を確認しました。メッセージ投入を続行します..."
+                  )
+                  break
+              except RuntimeError as poll_err:
+                if not str(poll_err).startswith("CHAT_APP_NOT_CONFIGURED:"):
+                  return False, str(poll_err)
+                if attempt % 5 == 0:
+                  print(
+                      f"     ... Google Chat API 構成の [保存] を待機中 ({attempt * 4}秒経過) ..."
+                  )
+          except KeyboardInterrupt:
+            print("\n  -> [INFO] Google Chat 構成待機をスキップしました。")
+            return (
+                False,
+                f"Skipped waiting for Google Chat App configuration ({console_url}).",
+            )
+
+        if not space_name:
+          raw_detail = err_str.split("CHAT_APP_NOT_CONFIGURED:", 1)[-1]
+          return (
+              False,
+              f"Google Chat app not configured yet. Configure at https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project={project_id} ({raw_detail[:160]})",
+          )
+      else:
+        return False, err_str
+    except Exception as e:
+      return False, f"Google Chat space creation error: {e}"
 
   if not space_name:
     return False, "Google Chat space name could not be resolved."
@@ -451,6 +601,62 @@ def seed_google_chat(
   )
 
 
+def _ensure_policy_only_in_datastore(token: str, project_id: str) -> None:
+  """Remove fallback email/chat archive PDF from next-finance-internal-docs once real data is seeded."""
+  if not project_id:
+    return
+  de_token = token
+  try:
+    t = subprocess.check_output(
+        ["gcloud", "auth", "print-access-token"],
+        stderr=subprocess.DEVNULL,
+        text=True,
+    ).strip()
+    if t:
+      de_token = t
+  except Exception:
+    pass
+  if not de_token:
+    return
+  ds_docs_url = (
+      f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_id}/"
+      "locations/global/collections/default_collection/dataStores/"
+      "next-finance-internal-docs/branches/0/documents?pageSize=100"
+  )
+  try:
+    docs_resp = api_request(ds_docs_url, de_token, project_id)
+    for doc in docs_resp.get("documents", []):
+      uri = doc.get("content", {}).get("uri", "")
+      if "next_finance_email_chat_archive" in uri or "email_chat_archive" in json.dumps(doc):
+        doc_name = doc.get("name", "")
+        if doc_name:
+          api_request(
+              f"https://discoveryengine.googleapis.com/v1alpha/{doc_name}",
+              de_token,
+              project_id,
+              method="DELETE",
+          )
+  except Exception:
+    pass
+
+
+def _token_has_gws_scopes(token: str, need_gmail: bool, need_chat: bool) -> bool:
+  if not token:
+    return False
+  try:
+    url = f"https://oauth2.googleapis.com/tokeninfo?access_token={urllib.parse.quote(token)}"
+    with urllib.request.urlopen(url, timeout=10) as resp:
+      info = json.loads(resp.read().decode("utf-8"))
+    scope_str = info.get("scope", "")
+    if need_gmail and "gmail" not in scope_str:
+      return False
+    if need_chat and "chat" not in scope_str:
+      return False
+    return True
+  except Exception:
+    return False
+
+
 def main() -> int:
   parser = argparse.ArgumentParser(
       description="Seed Gmail and Google Chat data for Next Finance hands-on."
@@ -472,6 +678,21 @@ def main() -> int:
       help="Force re-sending emails and chat messages even if already present",
   )
   parser.add_argument(
+      "--chat-only",
+      action="store_true",
+      help="Seed only Google Chat space and messages (skip Gmail)",
+  )
+  parser.add_argument(
+      "--gmail-only",
+      action="store_true",
+      help="Seed only Gmail messages (skip Google Chat)",
+  )
+  parser.add_argument(
+      "--non-interactive",
+      action="store_true",
+      help="Do not prompt or wait interactively for Google Chat configuration",
+  )
+  parser.add_argument(
       "--json-output",
       default="",
       help="Optional path to write JSON status result",
@@ -489,6 +710,10 @@ def main() -> int:
     except Exception:
       project_id = ""
 
+  need_gmail = not args.chat_only
+  need_chat = not args.gmail_only
+  interactive = not args.non_interactive
+
   token = args.token or os.environ.get("GWS_ACCESS_TOKEN", "")
   if not token:
     for cmd in (
@@ -497,11 +722,70 @@ def main() -> int:
     ):
       try:
         t = subprocess.check_output(cmd, stderr=subprocess.DEVNULL, text=True).strip()
-        if t:
+        if t and _token_has_gws_scopes(t, need_gmail=need_gmail, need_chat=need_chat):
           token = t
           break
       except Exception:
         continue
+
+  if (
+      not _token_has_gws_scopes(token, need_gmail=need_gmail, need_chat=need_chat)
+      and interactive
+      and sys.stdin.isatty()
+  ):
+    print(
+        "  ============================================================================"
+    )
+    print("  🔑 [Gmail / Google Chat 実データ投入用 OAuth 認可]")
+    print(
+        "     以下の URL を開いて講師アカウントで承認し、コードを入力してください。"
+    )
+    print(
+        "  ============================================================================"
+    )
+    scopes = (
+        "https://www.googleapis.com/auth/cloud-platform,"
+        "https://www.googleapis.com/auth/gmail.send,"
+        "https://www.googleapis.com/auth/gmail.modify,"
+        "https://www.googleapis.com/auth/gmail.insert,"
+        "https://www.googleapis.com/auth/chat.spaces,"
+        "https://www.googleapis.com/auth/chat.memberships,"
+        "https://www.googleapis.com/auth/chat.messages,"
+        "https://www.googleapis.com/auth/drive.file"
+    )
+    subprocess.run(
+        [
+            "gcloud",
+            "auth",
+            "application-default",
+            "login",
+            f"--scopes={scopes}",
+            "--no-launch-browser",
+        ],
+        check=False,
+    )
+    if project_id:
+      subprocess.run(
+          [
+              "gcloud",
+              "auth",
+              "application-default",
+              "set-quota-project",
+              project_id,
+              "--quiet",
+          ],
+          stdout=subprocess.DEVNULL,
+          stderr=subprocess.DEVNULL,
+          check=False,
+      )
+    try:
+      token = subprocess.check_output(
+          ["gcloud", "auth", "application-default", "print-access-token"],
+          stderr=subprocess.DEVNULL,
+          text=True,
+      ).strip()
+    except Exception:
+      pass
 
   if args.users:
     raw_users = args.users.replace(",", " ").split()
@@ -513,13 +797,19 @@ def main() -> int:
   else:
     users = discover_project_users(project_id)
 
-  print(f"  -> Target lab user accounts ({len(users)}): {', '.join(users) if users else 'auto (me)'}")
+  print(
+      f"  -> Target lab user accounts ({len(users)}): "
+      f"{', '.join(users) if users else 'auto (me)'}"
+  )
 
-  gmail_ok, gmail_msg = seed_gmail(token, project_id, users, force=args.force)
-  if gmail_ok:
-    print(f"  [OK] Gmail: {gmail_msg}")
+  if need_gmail:
+    gmail_ok, gmail_msg = seed_gmail(token, project_id, users, force=args.force)
+    if gmail_ok:
+      print(f"  [OK] Gmail: {gmail_msg}")
+    else:
+      print(f"  [WARN] Gmail: {gmail_msg}")
   else:
-    print(f"  [WARN] Gmail: {gmail_msg}")
+    gmail_ok, gmail_msg = True, "Skipped (--chat-only)"
 
   sender_email = ""
   try:
@@ -532,13 +822,24 @@ def main() -> int:
   except Exception:
     pass
 
-  chat_ok, chat_msg = seed_google_chat(
-      token, project_id, users, sender_email=sender_email, force=args.force
-  )
-  if chat_ok:
-    print(f"  [OK] Google Chat: {chat_msg}")
+  if need_chat:
+    chat_ok, chat_msg = seed_google_chat(
+        token,
+        project_id,
+        users,
+        sender_email=sender_email,
+        force=args.force,
+        interactive=interactive,
+    )
+    if chat_ok:
+      print(f"  [OK] Google Chat: {chat_msg}")
+    else:
+      print(f"  [WARN] Google Chat: {chat_msg}")
   else:
-    print(f"  [WARN] Google Chat: {chat_msg}")
+    chat_ok, chat_msg = True, "Skipped (--gmail-only)"
+
+  if gmail_ok and chat_ok:
+    _ensure_policy_only_in_datastore(token, project_id)
 
   result = {
       "gmail_seeded": gmail_ok,
@@ -551,7 +852,7 @@ def main() -> int:
     with open(args.json_output, "w", encoding="utf-8") as f:
       json.dump(result, f, ensure_ascii=False, indent=2)
 
-  return 0 if (gmail_ok and chat_ok) else (0 if gmail_ok else 1)
+  return 0 if (gmail_ok and chat_ok) else (0 if (gmail_ok and not args.chat_only) else 1)
 
 
 if __name__ == "__main__":

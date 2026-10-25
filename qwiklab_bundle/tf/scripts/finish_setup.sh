@@ -148,7 +148,7 @@ curl -s -X PATCH \
 
 sleep 2
 
-if [ "${GMAIL_SEEDED}" = "true" ] || [ "${FORCE_POLICY_ONLY:-}" = "1" ]; then
+if { [ "${GMAIL_SEEDED}" = "true" ] && [ "${CHAT_SEEDED}" = "true" ]; } || [ "${FORCE_POLICY_ONLY:-}" = "1" ]; then
   echo "  -> Importing ONLY Credit Policy PDF (next_finance_credit_policy.pdf) into ${DATASTORE_ID} so Gmail & Chat connectors are cited..."
   curl -s -X POST \
     -H "Authorization: Bearer ${TOKEN}" \
@@ -184,7 +184,7 @@ except Exception:
       "https://discoveryengine.googleapis.com/v1alpha/${DOC_NAME}" >/dev/null || true
   done
 else
-  echo "  -> [Fallback] GWS real data not seeded yet; importing scenario2/*.pdf into ${DATASTORE_ID}..."
+  echo "  -> [Fallback] Gmail (${GMAIL_SEEDED}) or Chat (${CHAT_SEEDED}) not both seeded; importing scenario2/*.pdf into ${DATASTORE_ID} as safety net..."
   curl -s -X POST \
     -H "Authorization: Bearer ${TOKEN}" \
     -H "Content-Type: application/json" \

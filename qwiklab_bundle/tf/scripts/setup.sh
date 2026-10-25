@@ -34,6 +34,7 @@ gcloud services enable \
   iam.googleapis.com \
   gmail.googleapis.com \
   chat.googleapis.com \
+  gsuiteaddons.googleapis.com \
   people.googleapis.com \
   admin.googleapis.com --project="${PROJECT_ID}"
 

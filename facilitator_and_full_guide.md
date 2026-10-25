@@ -71,6 +71,20 @@ curl -fL -o next-finance-ge-handson-qwiklab.zip https://raw.githubusercontent.co
 | **5. Gemini Enterprise エンジン** | アプリ `ネクストファイナンス Gemini Enterprise ハンズオン`（`next-finance-ge-app`）を作成し、既定モデルに **`gemini-3.8-flash`** を設定してデータストアを紐付け |
 | **6. 4種の A2A データ分析エージェント** | BigQuery Conversational Analytics 上に4つの部門別データエージェント（`請求・入金・与信分析` / `コールセンター分析` / `人事・タレント分析` / `営業・マーケROI分析`）を作成・公開し、Gemini Enterprise へ一括登録 |
 
+#### Step 2：スクリプト実行中の OAuth 承認 ＆ Google Chat API 最小構成の保存（初回1回・約20秒）
+
+スクリプトの `[2/6]` ステップで、全受講者アカウントへ実メール（Gmail）と実チャット（Google Chat）を自動配信するための案内が表示されます。
+
+1. **OAuth 認可コードの入力**: 表示される URL を開き、講師アカウント（`user00`）で承認して verification code を貼り付けます（これだけで Gmail 2通が全11アカウントへ即座に配信されます）。
+2. **Google Chat API 構成の保存（新規 Qwiklabs プロジェクト時）**:
+   * Google Chat REST API の仕様上、新規プロジェクトでスペースを自動作成するには Cloud Console の「Google Chat API ＞ 構成」の保存が1回必要です。
+   * ターミナルに表示される直リンク（`https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=<PROJECT_ID>`）を開き、以下の最小設定を入力して **[保存 (Save)]** をクリックします（保存した瞬間にスクリプトが自動検知してスペース作成＆3件のメッセージ投稿を完了します）：
+     * **アプリ名 (App name)**: `Next Finance Bot`
+     * **アバターのURL (Avatar URL)**: `https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ac/512.png`
+     * **説明 (Description)**: `Next Finance Hands-on`
+     * **機能 / 接続設定**: 「インタラクティブ機能を有効にする」のチェックを外す（または HTTP エンドポイント URL に `https://example.com` を入力）
+   * ※後から Google Chat のみ再投入する場合は `python3 handson/tf/scripts/seed_gws_data.py --chat-only` を実行できます。
+
 #### Step 3：Gemini Enterprise Web アプリ URL の取得と貸出 Chromebook の事前ログイン（5分）
 
 1. スクリプト完了時に Cloud Shell に表示される **Gemini Enterprise 管理画面 URL**（またはコンソールの **AI Applications → Apps → ネクストファイナンス Gemini Enterprise ハンズオン**）を開きます。
