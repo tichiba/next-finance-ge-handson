@@ -25,6 +25,7 @@ curl -fL -o next-finance-ge-handson-qwiklab.zip https://raw.githubusercontent.co
 2. **途中 `[2/6]` の OAuth 認可（Gmail / Chat 実データ投入）**：
    - `Do you want to continue (Y/n)?` に `y` を入力 → 表示された URL を開いて **ユーザー名00** で承認 → コードを Cloud Shell に貼り付けます。
 3. **途中 `[2/6]` の Google Chat API 初回構成**：
+   - 別タブで一度 **https://chat.google.com** を開きます（アカウントの Chat プロファイル初回有効化のため、開くだけでOKです）。
    - ターミナルに表示された直リンク URL（`https://console.cloud.google.com/apis/api/chat.googleapis.com/hangouts-chat?project=...`）を開き、以下の4項目を入力して **［保存］** をクリックします（保存するとスクリプトが自動検知して再開します）。
      - **アプリ名**：`Next Finance Bot`
      - **アバターのURL**：`https://developers.google.com/chat/images/quickstart-app-avatar.png`

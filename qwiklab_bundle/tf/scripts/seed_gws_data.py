@@ -377,11 +377,8 @@ def _create_chat_space_once(
     space_name = sp_res.get("name", "")
     if space_name:
       return space_name
-  except urllib.error.HTTPError as e:
-    err_body = e.read().decode("utf-8", errors="ignore")
-    if e.code == 404 and "Google Chat app not found" in err_body:
-      raise RuntimeError(f"CHAT_APP_NOT_CONFIGURED:{err_body}") from e
   except Exception:
+    # Fall through to POST /v1/spaces without memberships
     pass
 
   # Fallback: create space via POST /v1/spaces without memberships, then add members separately
@@ -399,7 +396,12 @@ def _create_chat_space_once(
     return sp_res.get("name", "")
   except urllib.error.HTTPError as e:
     err_body = e.read().decode("utf-8", errors="ignore")
-    if e.code == 404 and "Google Chat app not found" in err_body:
+    if e.code in (403, 404) and (
+        "Google Chat app not found" in err_body
+        or "Permission denied" in err_body
+        or "PERMISSION_DENIED" in err_body
+        or "NOT_FOUND" in err_body
+    ):
       raise RuntimeError(f"CHAT_APP_NOT_CONFIGURED:{err_body}") from e
     raise RuntimeError(
         f"Google Chat space creation failed (HTTP {e.code}): {err_body[:240]}"
@@ -425,11 +427,11 @@ def seed_google_chat(
       if sp.get("displayName") == CHAT_SPACE_DISPLAY_NAME:
         space_name = sp.get("name", "")
         break
-  except urllib.error.HTTPError as e:
-    err_body = e.read().decode("utf-8", errors="ignore")
-    return False, f"Google Chat API list spaces failed (HTTP {e.code}): {err_body[:240]}"
-  except Exception as e:
-    return False, f"Google Chat API connection error: {e}"
+  except Exception:
+    # Do not return early on HTTP 403/404 from spaces.list (occurs when Chat App is not
+    # configured yet or user has not initialized Google Chat); proceed to space creation
+    # flow which prints the Cloud Console direct configuration link and polls.
+    space_name = ""
 
   other_users = [
       u
@@ -454,45 +456,60 @@ def seed_google_chat(
           except Exception:
             space_name = ""
 
-        # Step 2: If still not configured and running in interactive terminal, guide and poll
-        if not space_name and interactive and sys.stdin.isatty():
+        # Step 2: If still not configured and running in interactive mode, guide and poll
+        if not space_name and interactive:
           console_url = (
               "https://console.cloud.google.com/apis/api/chat.googleapis.com/"
               f"hangouts-chat?project={project_id}"
           )
           print(
-              "\n  ============================================================================"
+              "\n  ============================================================================",
+              flush=True,
           )
           print(
-              "  💬 [Google Chat API 初期構成の保存（初回1回・約20秒）]"
+              "  💬 [Google Chat API 初期構成の保存（初回1回・約20秒）]",
+              flush=True,
           )
           print(
-              "     新規プロジェクトで Google Chat スペースを作成するため、"
+              "     新規プロジェクトで Google Chat スペースを作成するため、",
+              flush=True,
           )
           print(
-              "     以下の Cloud Console 直リンクを開き、最小設定を [保存] してください。"
+              "     以下の1・2を実施してください（完了すると自動検知して再開します）。",
+              flush=True,
           )
-          print("")
-          print(f"     👉 直リンク: {console_url}")
-          print("")
-          print("     【入力値（コピー＆ペースト用）】")
-          print("       ・アプリ名 (App name)       : Next Finance Bot")
+          print("", flush=True)
           print(
-              "       ・アバターのURL (Avatar URL): https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ac/512.png"
+              "     1️⃣ Google Chat 初回有効化（別タブで一度開くだけ）:",
+              flush=True,
           )
-          print("       ・説明 (Description)        : Next Finance Hands-on")
+          print("        👉 https://chat.google.com", flush=True)
+          print("", flush=True)
           print(
-              "       ・機能 / 接続設定           : 「インタラクティブ機能を有効にする」のチェックを外す"
+              "     2️⃣ Cloud Console 直リンクを開き、以下の4項目を入力して [保存]:",
+              flush=True,
+          )
+          print(f"        👉 {console_url}", flush=True)
+          print("", flush=True)
+          print("     【入力値（コピー＆ペースト用）】", flush=True)
+          print("       ・アプリ名 (App name)       : Next Finance Bot", flush=True)
+          print(
+              "       ・アバターのURL (Avatar URL): https://developers.google.com/chat/images/quickstart-app-avatar.png",
+              flush=True,
+          )
+          print("       ・説明 (Description)        : Next Finance Hands-on Helper", flush=True)
+          print(
+              "       ・機能 / 接続設定           : 「インタラクティブ機能を有効にする」のチェックを外す",
+              flush=True,
+          )
+          print("", flush=True)
+          print(
+              "     ⏳ コンソールで [保存 (Save)] をクリックすると自動検知して再開します（最大3分待機 / スキップは Ctrl+C）...",
+              flush=True,
           )
           print(
-              "                                     （外せない場合は HTTP エンドポイント URL に https://example.com を入力）"
-          )
-          print("")
-          print(
-              "     ⏳ コンソールで [保存 (Save)] をクリックすると自動検知して再開します（最大3分待機 / スキップは Ctrl+C）..."
-          )
-          print(
-              "  ============================================================================"
+              "  ============================================================================",
+              flush=True,
           )
           try:
             for attempt in range(1, 46):
@@ -504,7 +521,8 @@ def seed_google_chat(
                 if space_name:
                   created_new_space = True
                   print(
-                      "  -> [検知成功] Google Chat API 構成の保存を確認しました。メッセージ投入を続行します..."
+                      "  -> [検知成功] Google Chat API 構成の保存を確認しました。メッセージ投入を続行します...",
+                      flush=True,
                   )
                   break
               except RuntimeError as poll_err:
@@ -512,10 +530,11 @@ def seed_google_chat(
                   return False, str(poll_err)
                 if attempt % 5 == 0:
                   print(
-                      f"     ... Google Chat API 構成の [保存] を待機中 ({attempt * 4}秒経過) ..."
+                      f"     ... Google Chat API 構成の [保存] を待機中 ({attempt * 4}秒経過) ...",
+                      flush=True,
                   )
           except KeyboardInterrupt:
-            print("\n  -> [INFO] Google Chat 構成待機をスキップしました。")
+            print("\n  -> [INFO] Google Chat 構成待機をスキップしました。", flush=True)
             return (
                 False,
                 f"Skipped waiting for Google Chat App configuration ({console_url}).",
