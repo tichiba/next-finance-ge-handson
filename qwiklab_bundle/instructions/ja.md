@@ -44,8 +44,13 @@ python3 handson/tf/scripts/seed_gws_data.py --project-id "$(gcloud config get-va
 
 1. `setup.sh` 完了時に出力される管理コンソール URL（または Cloud Console で「Gemini Enterprise」を検索 → `next-finance-ge-app`）を開きます。
 2. 左メニュー **［Settings］** で Identity Provider が **「Google Identity」** になっていることを確認します（未設定なら設定して保存）。
-3. 左メニュー **［Integration］** を開き、**「Web アプリへのリンク（Web App URL）」**（`https://vertexaisearch.cloud.google.com/home/cid/...`）をコピーします。
-4. **【重要】Codelab（`docs/index.html`）のボタン URL を差し替えて GitHub へ push します**：
+3. 左メニュー **［Configurations（構成）］→［Feature management（機能管理）］** で、以下の4項目が **オン** になっていることを確認します（スクリプトで自動有効化済みですが、オフの場合はオンにして保存）。
+   - **Gemini 4 Argon**（モデル設定）
+   - **音声入力**（Speech-to-text）
+   - **キャンバス**（Canvas）
+   - **モデルセレクタ**（Model selector）
+4. 左メニュー **［Integration］** を開き、**「Web アプリへのリンク（Web App URL）」**（`https://vertexaisearch.cloud.google.com/home/cid/...`）をコピーします。
+5. **【重要】Codelab（`docs/index.html`）のボタン URL を差し替えて GitHub へ push します**：
    - リポジトリの `docs/index.html`（808行目 `id="btn-open-ge-primary"` の `href`）を、コピーした新しい Web App URL に差し替えて GitHub へ push し、受講者用 Codelab（ https://goo.gle/ntt-gemini ）の **［Gemini Enterprise Web アプリを開く］** ボタンの飛び先を更新します。
    - ローカル（または Jetski）で差し替えて push するワンライナー：
 

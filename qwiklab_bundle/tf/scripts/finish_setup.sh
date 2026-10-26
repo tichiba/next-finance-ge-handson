@@ -364,9 +364,13 @@ except Exception:
 echo "  -> Linked DataStores for Engine (${ENGINE_ID}): ${DS_ARRAY}"
 
 # ------------------------------------------------------------------------------
-# 4. Create Gemini Enterprise (Agentspace) Engine & Configure gemini-3.8-flash
+# 4. Create Gemini Enterprise (Agentspace) Engine & Configure Features / Models
+#    - Gemini 4 Argon (gemini-4-argon) + gemini-3.8-flash
+#    - 音声入力 (speech-to-text, bi-directional-audio)
+#    - キャンバス (canvas: ON, disable-canvas: OFF, canvas-workspace: ON, canvas-app-builder: ON)
+#    - モデルセレクタ (model-selector: ON)
 # ------------------------------------------------------------------------------
-echo "[4/6] Creating/Updating Gemini Enterprise Engine (${ENGINE_ID}) with model ${MODEL_ID}..."
+echo "[4/6] Creating/Updating Gemini Enterprise Engine (${ENGINE_ID}) with Features & Models (gemini-4-argon / speech-to-text / canvas / model-selector)..."
 curl -s -X POST \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
@@ -384,34 +388,118 @@ curl -s -X POST \
     },
     \"commonConfig\": {
       \"companyName\": \"ネクストファイナンス株式会社\"
+    },
+    \"features\": {
+      \"model-selector\": \"FEATURE_STATE_ON\",
+      \"speech-to-text\": \"FEATURE_STATE_ON\",
+      \"bi-directional-audio\": \"FEATURE_STATE_ON\",
+      \"canvas\": \"FEATURE_STATE_ON\",
+      \"disable-canvas\": \"FEATURE_STATE_OFF\",
+      \"canvas-workspace\": \"FEATURE_STATE_ON\",
+      \"canvas-app-builder\": \"FEATURE_STATE_ON\",
+      \"agent-gallery\": \"FEATURE_STATE_ON\",
+      \"prompt-gallery\": \"FEATURE_STATE_ON\",
+      \"notebook-lm\": \"FEATURE_STATE_ON\",
+      \"image-generation\": \"FEATURE_STATE_ON\",
+      \"video-generation\": \"FEATURE_STATE_ON\",
+      \"talk-to-content\": \"FEATURE_STATE_ON\",
+      \"google-drive-upload\": \"FEATURE_STATE_ON\",
+      \"agent-sharing\": \"FEATURE_STATE_ON\"
+    },
+    \"modelConfigs\": {
+      \"gemini-4-argon\": \"MODEL_ENABLED\",
+      \"gemini-3.8-flash\": \"MODEL_ENABLED\",
+      \"gemini-3.6-flash\": \"MODEL_ENABLED\",
+      \"gemini-3.5-flash\": \"MODEL_ENABLED\",
+      \"gemini-3.1-pro-preview\": \"MODEL_ENABLED\",
+      \"gemini-2.5-pro\": \"MODEL_ENABLED\",
+      \"gemini-2.5-flash\": \"MODEL_ENABLED\"
     }
   }" >/dev/null || true
 
 sleep 3
 
-# Ensure existing Engine also has the updated dataStoreIds (Gmail + Google Chat + Internal Docs)
-curl -s -X PATCH \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}?updateMask=dataStoreIds" \
-  -d "{
-    \"dataStoreIds\": ${DS_ARRAY}
-  }" >/dev/null || true
+# Fetch existing Engine state and merge features + modelConfigs + dataStoreIds
+EXISTING_ENGINE_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}" || true)
 
-# Explicitly enable and set gemini-3.8-flash on the Engine WidgetConfig
+python3 - <<PYEOF > /tmp/engine_patch_payload.json
+import json
+
+try:
+    eng = json.loads('''${EXISTING_ENGINE_JSON}''')
+except Exception:
+    eng = {}
+
+ds_ids = json.loads('''${DS_ARRAY}''')
+features = eng.get("features", {}) or {}
+features.update({
+    "model-selector": "FEATURE_STATE_ON",
+    "speech-to-text": "FEATURE_STATE_ON",
+    "bi-directional-audio": "FEATURE_STATE_ON",
+    "canvas": "FEATURE_STATE_ON",
+    "disable-canvas": "FEATURE_STATE_OFF",
+    "canvas-workspace": "FEATURE_STATE_ON",
+    "canvas-app-builder": "FEATURE_STATE_ON",
+    "agent-gallery": "FEATURE_STATE_ON",
+    "prompt-gallery": "FEATURE_STATE_ON",
+    "notebook-lm": "FEATURE_STATE_ON",
+    "image-generation": "FEATURE_STATE_ON",
+    "video-generation": "FEATURE_STATE_ON",
+    "talk-to-content": "FEATURE_STATE_ON",
+    "google-drive-upload": "FEATURE_STATE_ON",
+    "agent-sharing": "FEATURE_STATE_ON",
+})
+
+model_configs = eng.get("modelConfigs", {}) or {}
+model_configs.update({
+    "gemini-4-argon": "MODEL_ENABLED",
+    "gemini-3.8-flash": "MODEL_ENABLED",
+    "gemini-3.6-flash": "MODEL_ENABLED",
+    "gemini-3.5-flash": "MODEL_ENABLED",
+    "gemini-3.1-pro-preview": "MODEL_ENABLED",
+    "gemini-2.5-pro": "MODEL_ENABLED",
+    "gemini-2.5-flash": "MODEL_ENABLED",
+})
+
+payload = {
+    "dataStoreIds": ds_ids,
+    "features": features,
+    "modelConfigs": model_configs,
+}
+print(json.dumps(payload, ensure_ascii=False))
+PYEOF
+
+ENGINE_PATCH_RESP=$(curl -s -X PATCH \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}?updateMask=dataStoreIds,features,modelConfigs" \
+  -d @/tmp/engine_patch_payload.json || true)
+rm -f /tmp/engine_patch_payload.json
+
+python3 -c "
+import json
+try:
+    d = json.loads('''${ENGINE_PATCH_RESP}''')
+    f = d.get('features', {})
+    m = d.get('modelConfigs', {})
+    print(f'  [OK] Engine features enabled : model-selector={f.get(\"model-selector\")}, speech-to-text={f.get(\"speech-to-text\")}, canvas={f.get(\"canvas\")} (disable-canvas={f.get(\"disable-canvas\")})')
+    print(f'  [OK] Engine models enabled   : gemini-4-argon={m.get(\"gemini-4-argon\")}, gemini-3.8-flash={m.get(\"gemini-3.8-flash\")}')
+except Exception:
+    pass
+"
+
+# Explicitly set generativeAnswerConfig.modelVersion on the Engine WidgetConfig
 curl -s -X PATCH \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/widgetConfigs/default_search_widget_config?updateMask=uiSettings.generativeAnswerConfig.modelVersion,uiSettings.modelConfigs" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/widgetConfigs/default_search_widget_config?updateMask=uiSettings.generativeAnswerConfig.modelVersion" \
   -d "{
     \"uiSettings\": {
       \"generativeAnswerConfig\": {
         \"modelVersion\": \"${MODEL_ID}\"
-      },
-      \"modelConfigs\": {
-        \"${MODEL_ID}\": \"MODEL_ENABLED\"
       }
     }
   }" >/dev/null || true
@@ -1141,12 +1229,13 @@ echo " 5. シナリオ1用 高速抜粋版 IR 資料 PDF ダウンロード URL 
 echo "    - ① NTTグループ統合報告書2026(公式12P高速抜粋・1.5MB): https://tichiba.github.io/next-finance-ge-handson/files/ntt_group_integrated_report_2026_excerpt.pdf"
 echo "    - ② NTTファイナンス決算資料(公式・106KB)             : https://www.ntt-finance.co.jp/ir/tanshin/pdf/r7_kessan_renketsuzaimu.pdf"
 echo "    - ③ IR事業ハイライト・重点課題まとめ(2P・588KB)      : https://tichiba.github.io/next-finance-ge-handson/files/next_finance_ir_highlights_2026.pdf"
-echo " 6. Gemini Enterprise Web App / 管理画面 URL (Model: ${MODEL_ID}) :"
+echo " 6. Gemini Enterprise Web App / 管理画面 URL (Gemini 4 Argon / 音声入力 / キャンバス / モデルセレクタ 有効化済) :"
 if [ -n "${CID}" ]; then
   echo "    - Web App 直接URL : https://vertexaisearch.cloud.google.com/home/cid/${CID}"
   echo "    - Codelab (CID付) : https://tichiba.github.io/next-finance-ge-handson/?cid=${CID}"
 fi
 echo "    - Console 管理画面: https://console.cloud.google.com/ai/agentspace/locations/global/engines/${ENGINE_ID}/overview?project=${PROJECT_ID}"
+echo "    - 機能管理直リンク: https://console.cloud.google.com/ai/agentspace/locations/global/engines/${ENGINE_ID}/configurations/feature-control?project=${PROJECT_ID}"
 echo " 7. 全リソース削除（クリーンアップ）コマンド :"
 echo "    bash handson/tf/scripts/cleanup.sh ${PROJECT_ID}"
 echo "=============================================================================="
