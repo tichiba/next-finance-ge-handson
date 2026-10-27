@@ -58,6 +58,44 @@ curl -s -X PATCH \
     "enableExpiredLicenseAutoUpdate": true
   }' >/dev/null || true
 
+# ID プロバイダ（aclConfig.idpConfig.idpType）を Google Identity (GSUITE) に設定する。
+# Gmail / Google Chat コネクタは aclEnabled=true が必須で、IdP 未設定のまま作成すると
+# FAILED_PRECONDITION "IdP must be selected before creating an ACLed Data Connector." で拒否される。
+# provision は非同期 LRO のため、Customer 行が作成されるまで最大 60 秒リトライする。
+ACL_URL="https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/aclConfig"
+IDP_TYPE=""
+for _i in $(seq 1 12); do
+  IDP_TYPE=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" "${ACL_URL}" \
+    | python3 -c 'import json,sys
+try:
+    print(json.load(sys.stdin).get("idpConfig", {}).get("idpType", ""))
+except Exception:
+    print("")' || true)
+  if [ "${IDP_TYPE}" = "GSUITE" ]; then
+    break
+  fi
+  ACL_RESP=$(curl -s -w '\n%{http_code}' -X PATCH \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "${ACL_URL}" \
+    -d '{"idpConfig": {"idpType": "GSUITE"}}' || true)
+  ACL_CODE=$(echo "${ACL_RESP}" | tail -n1)
+  if [ "${ACL_CODE}" = "200" ]; then
+    IDP_TYPE="GSUITE"
+    break
+  fi
+  echo "  [WAIT] aclConfig 更新待機中 (HTTP ${ACL_CODE}, ${_i}/12): $(echo "${ACL_RESP}" | sed '$d' | tr -d '\n' | cut -c1-200)"
+  sleep 5
+done
+if [ "${IDP_TYPE}" = "GSUITE" ]; then
+  echo "  [OK] Identity Provider = Google Identity (GSUITE)"
+else
+  echo "  [ERROR] Identity Provider を GSUITE に設定できませんでした（現在値: '${IDP_TYPE:-未設定}'）。"
+  echo "          Gmail / Google Chat コネクタが作成できないため、Cloud Console > Gemini Enterprise > 設定 > 認証 で"
+  echo "          「Google Identity」を選択後、本スクリプトを再実行してください。"
+fi
+
 # ------------------------------------------------------------------------------
 # 2. Seed Gmail / Google Chat Real Messages & Import Internal Policy PDF to GCS DataStore
 # ------------------------------------------------------------------------------
@@ -210,57 +248,89 @@ curl -s -X DELETE \
   -H "X-Goog-User-Project: ${PROJECT_ID}" \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/gws-google-drive-ds" >/dev/null 2>&1 || true
 
-# 3a. Set up V2 Federated DataConnectors for Gmail (google_mail) and Google Chat (google_chat)
-curl -s -X POST \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+# Discovery Engine API を呼び、HTTP ステータスとエラー内容を表示する（失敗を握りつぶさない）。
+# 使い方: de_call <ラベル> <METHOD> <URL> <JSON本文>
+de_call() {
+  local label="$1" method="$2" url="$3" body="$4" resp code msg
+  resp=$(curl -s -w '\n%{http_code}' -X "${method}" \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "${url}" -d "${body}" || true)
+  code=$(echo "${resp}" | tail -n1)
+  msg=$(echo "${resp}" | sed '$d' | python3 -c 'import json,sys
+try:
+    e = json.load(sys.stdin).get("error", {})
+    print(str(e.get("status", "")) + ": " + str(e.get("message", "")) if e else "")
+except Exception:
+    print("")' 2>/dev/null || true)
+  case "${code}" in
+    200) echo "  [OK] ${label}" ;;
+    409) echo "  [OK] ${label}（作成済み）" ;;
+    *)   echo "  [ERROR] ${label} 失敗 (HTTP ${code}) ${msg}" ;;
+  esac
+}
+
+# default_collection に Gmail / Chat の DataStore が存在するか判定する（引数: GOOGLE_MAIL / GOOGLE_CHAT）
+ws_ds_exists() {
+  curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?pageSize=100" \
+    | python3 -c 'import json,sys
+t = sys.argv[1]
+try:
+    for d in json.load(sys.stdin).get("dataStores", []):
+        i = d.get("name", "").split("/")[-1]
+        if d.get("workspaceConfig", {}).get("type") == t or t.lower() in i:
+            sys.exit(0)
+except Exception:
+    pass
+sys.exit(1)' "$1"
+}
+
+# 3a. Set up V2 DataConnectors for Gmail (google_mail) and Google Chat (google_chat)
+#     ※ aclEnabled=true のため、[1/6] で IdP = GSUITE が設定済みであることが前提
+de_call "Gmail コネクタ作成 (setUpDataConnector: gws-gmail-connector)" POST \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global:setUpDataConnector" \
-  -d '{
+  '{
     "collectionId": "gws-gmail-connector",
     "collectionDisplayName": "Gmail (GWS 横断検索)",
     "dataConnector": {
       "dataSource": "google_mail",
-      "entities": [
-        {
-          "entityName": "google_mail"
-        }
-      ],
+      "entities": [{"entityName": "google_mail"}],
       "connectorModes": ["FEDERATED"],
       "aclEnabled": true
     }
-  }' >/dev/null || true
+  }'
 
-curl -s -X POST \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+de_call "Google Chat コネクタ作成 (setUpDataConnector: gws-gchat-connector)" POST \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global:setUpDataConnector" \
-  -d '{
+  '{
     "collectionId": "gws-gchat-connector",
     "collectionDisplayName": "Google Chat (GWS 横断検索)",
     "dataConnector": {
       "dataSource": "google_chat",
-      "entities": [
-        {
-          "entityName": "google_chat"
-        }
-      ],
+      "entities": [{"entityName": "google_chat"}],
       "connectorModes": ["FEDERATED"],
       "aclEnabled": true
     }
-  }' >/dev/null || true
+  }'
 
-sleep 3
+# setUpDataConnector は DataStore を非同期に作成するため、最大 60 秒ポーリングで待つ
+# （待たずにフォールバックを作ると Gmail / Chat の DataStore が重複するため）
+for _i in $(seq 1 12); do
+  if ws_ds_exists GOOGLE_MAIL && ws_ds_exists GOOGLE_CHAT; then
+    break
+  fi
+  sleep 5
+done
 
 # 3b. Ensure Workspace DataStores exist in default_collection for both GOOGLE_MAIL and GOOGLE_CHAT
-DS_CHECK_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores")
-
-NEED_FALLBACK_DS=$(python3 -c "
-import json
+NEED_FALLBACK_DS=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?pageSize=100" \
+  | python3 -c "
+import json, sys
 try:
-    data = json.loads('''${DS_CHECK_JSON}''')
+    data = json.load(sys.stdin)
     has_mail = False
     has_chat = False
     has_conn_mail = False
@@ -305,62 +375,50 @@ if [[ "${NEED_FALLBACK_DS}" == *"CLEAN_LEGACY_CHAT"* ]]; then
     "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/gws-gchat-ds" >/dev/null 2>&1 || true
 fi
 
-if [[ "${NEED_FALLBACK_DS}" == *"CREATE_MAIL"* ]]; then
-  curl -s -X POST \
-    -H "Authorization: Bearer ${TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+if [[ "${NEED_FALLBACK_DS}" == *"CREATE_MAIL"* ]] && ! ws_ds_exists GOOGLE_MAIL; then
+  de_call "Gmail DataStore 作成 (フォールバック: gws-gmail-ds)" POST \
     "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=gws-gmail-ds" \
-    -d '{
+    '{
       "displayName": "Gmail (GWS 横断検索)",
       "industryVertical": "GENERIC",
       "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
       "contentConfig": "GOOGLE_WORKSPACE",
       "aclEnabled": true,
-      "workspaceConfig": {
-        "type": "GOOGLE_MAIL"
-      }
-    }' >/dev/null || true
+      "workspaceConfig": {"type": "GOOGLE_MAIL"}
+    }'
 fi
 
-if [[ "${NEED_FALLBACK_DS}" == *"CREATE_CHAT"* ]]; then
-  curl -s -X POST \
-    -H "Authorization: Bearer ${TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+if [[ "${NEED_FALLBACK_DS}" == *"CREATE_CHAT"* ]] && ! ws_ds_exists GOOGLE_CHAT; then
+  de_call "Google Chat DataStore 作成 (フォールバック: gws-gchat-ds)" POST \
     "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?dataStoreId=gws-gchat-ds" \
-    -d '{
+    '{
       "displayName": "Google Chat (GWS 横断検索)",
       "industryVertical": "GENERIC",
       "solutionTypes": ["SOLUTION_TYPE_SEARCH"],
       "contentConfig": "GOOGLE_WORKSPACE",
       "aclEnabled": true,
-      "workspaceConfig": {
-        "type": "GOOGLE_CHAT"
-      }
-    }' >/dev/null || true
+      "workspaceConfig": {"type": "GOOGLE_CHAT"}
+    }'
 fi
 
 sleep 2
 
-DS_LIST_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores")
-
-DS_ARRAY=$(python3 -c "
-import json
+# Engine に紐付ける DataStore 一覧を作成（JSON は標準入力で渡し、パース失敗による誤った ID 混入を防ぐ）
+DS_ARRAY=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores?pageSize=100" \
+  | python3 -c 'import json,sys
+base = sys.argv[1]
 try:
-    data = json.loads('''${DS_LIST_JSON}''')
-    ids = [
-        d['name'].split('/')[-1]
-        for d in data.get('dataStores', [])
-        if d['name'].split('/')[-1] != 'gws-google-drive-ds'
-    ]
-    if '${DATASTORE_ID}' not in ids:
-        ids.insert(0, '${DATASTORE_ID}')
-    print(json.dumps(ids))
+    ids = [d["name"].split("/")[-1] for d in json.load(sys.stdin).get("dataStores", [])]
 except Exception:
-    print('[\"${DATASTORE_ID}\", \"gws-gmail-ds\", \"gws-gchat-ds\"]')
-")
+    ids = []
+ids = [i for i in ids if i != "gws-google-drive-ds"]
+if base not in ids:
+    ids.insert(0, base)
+print(json.dumps(ids))' "${DATASTORE_ID}")
+
+if ws_ds_exists GOOGLE_MAIL; then echo "  [OK] Gmail DataStore: 作成済み"; else echo "  [ERROR] Gmail DataStore が存在しません（上記エラーを確認してください）"; fi
+if ws_ds_exists GOOGLE_CHAT; then echo "  [OK] Google Chat DataStore: 作成済み"; else echo "  [ERROR] Google Chat DataStore が存在しません（上記エラーを確認してください）"; fi
 echo "  -> Linked DataStores for Engine (${ENGINE_ID}): ${DS_ARRAY}"
 
 # ------------------------------------------------------------------------------

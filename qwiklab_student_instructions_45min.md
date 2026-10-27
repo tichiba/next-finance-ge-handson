@@ -43,7 +43,9 @@ python3 handson/tf/scripts/seed_gws_data.py --project-id "$(gcloud config get-va
 ## Step 3：Gemini Enterprise 確認と Codelab の URL 差し替え【必須】
 
 1. `setup.sh` 完了時に出力される管理コンソール URL（または Cloud Console で「Gemini Enterprise」を検索 → `next-finance-ge-app`）を開きます。
-2. 左メニュー **［Settings］** で Identity Provider が **「Google Identity」** になっていることを確認します（未設定なら設定して保存）。
+2. 左メニュー **［Settings］** で Identity Provider が **「Google Identity」** になっていることを確認します（`setup.sh` の `[1/6]` で自動設定済み。Gmail / Google Chat コネクタは Identity Provider 設定が前提のため、スクリプトはコネクタ作成前に設定します）。
+   - 左メニュー **［Connected data stores（接続されたデータストア）］** に **社内規程（GCS）・Gmail・Google Chat の3つ** が表示されていることを確認します。
+   - Gmail / Google Chat が無い場合は、`setup.sh` ログの `[3/6]` に出力された `[ERROR] ...` の内容を確認し、Identity Provider を「Google Identity」に設定したうえで、`SKIP_GWS_OAUTH=1 bash handson/tf/scripts/finish_setup.sh` を再実行します（作成済みのリソースはスキップされ、不足分だけが追加・接続されます）。
 3. 左メニュー **［Configurations（構成）］→［Feature management（機能管理）］** で、以下の4項目が **オン** になっていることを確認します（スクリプトで自動有効化済みですが、オフの場合はオンにして保存）。
    - **Gemini 4 Argon**（モデル設定）
    - **音声入力**（Speech-to-text）
