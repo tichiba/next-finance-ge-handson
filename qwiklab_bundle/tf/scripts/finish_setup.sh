@@ -204,10 +204,10 @@ if { [ "${GMAIL_SEEDED}" = "true" ] && [ "${CHAT_SEEDED}" = "true" ]; } || [ "${
   # Also explicitly remove next_finance_email_chat_archive.pdf if it was previously imported
   DOCS_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
     "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents?pageSize=100" || true)
-  ARCHIVE_DOC_NAMES=$(python3 -c "
-import json
+  ARCHIVE_DOC_NAMES=$(printf '%s' "${DOCS_JSON}" | python3 -c "
+import json, sys
 try:
-    d = json.loads('''${DOCS_JSON}''')
+    d = json.load(sys.stdin)
     for doc in d.get('documents', []):
         uri = doc.get('content', {}).get('uri', '')
         if 'next_finance_email_chat_archive' in uri or 'email_chat_archive' in json.dumps(doc):
@@ -429,124 +429,148 @@ echo "  -> Linked DataStores for Engine (${ENGINE_ID}): ${DS_ARRAY}"
 #    - モデルセレクタ (model-selector: ON)
 # ------------------------------------------------------------------------------
 echo "[4/6] Creating/Updating Gemini Enterprise Engine (${ENGINE_ID}) with Features & Models (gemini-4-argon / speech-to-text / canvas / model-selector)..."
-curl -s -X POST \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+ENGINE_URL="https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}"
+ENG_TMP=$(mktemp -d)
+
+# 有効化する機能・モデル（POST 作成時と PATCH 更新時で共通）
+cat > "${ENG_TMP}/features.json" <<'JSONEOF'
+{
+  "model-selector": "FEATURE_STATE_ON",
+  "speech-to-text": "FEATURE_STATE_ON",
+  "bi-directional-audio": "FEATURE_STATE_ON",
+  "canvas": "FEATURE_STATE_ON",
+  "disable-canvas": "FEATURE_STATE_OFF",
+  "canvas-workspace": "FEATURE_STATE_ON",
+  "canvas-app-builder": "FEATURE_STATE_ON",
+  "agent-gallery": "FEATURE_STATE_ON",
+  "prompt-gallery": "FEATURE_STATE_ON",
+  "notebook-lm": "FEATURE_STATE_ON",
+  "image-generation": "FEATURE_STATE_ON",
+  "video-generation": "FEATURE_STATE_ON",
+  "talk-to-content": "FEATURE_STATE_ON",
+  "google-drive-upload": "FEATURE_STATE_ON",
+  "agent-sharing": "FEATURE_STATE_ON"
+}
+JSONEOF
+cat > "${ENG_TMP}/models.json" <<'JSONEOF'
+{
+  "gemini-4-argon": "MODEL_ENABLED",
+  "gemini-3.8-flash": "MODEL_ENABLED",
+  "gemini-3.6-flash": "MODEL_ENABLED",
+  "gemini-3.5-flash": "MODEL_ENABLED",
+  "gemini-3.1-pro-preview": "MODEL_ENABLED",
+  "gemini-2.5-pro": "MODEL_ENABLED",
+  "gemini-2.5-flash": "MODEL_ENABLED"
+}
+JSONEOF
+
+# 4a. Engine 新規作成（作成時に 3 データストアを指定する）
+#     ※ SOLUTION_TYPE_SEARCH の Engine は「データストア 1 つで作成」されると、後から API で
+#       データストアを追加できない（FAILED_PRECONDITION）。そのため作成時に全データストアを渡す。
+python3 - "${ENG_TMP}" "${DS_ARRAY}" > "${ENG_TMP}/create.json" <<'PYEOF'
+import json, sys
+d = sys.argv[1]
+print(json.dumps({
+    "displayName": "ネクストファイナンス Gemini Enterprise ハンズオン",
+    "industryVertical": "GENERIC",
+    "solutionType": "SOLUTION_TYPE_SEARCH",
+    "appType": "APP_TYPE_INTRANET",
+    "dataStoreIds": json.loads(sys.argv[2]),
+    "searchEngineConfig": {"searchTier": "SEARCH_TIER_ENTERPRISE", "searchAddOns": ["SEARCH_ADD_ON_LLM"]},
+    "commonConfig": {"companyName": "ネクストファイナンス株式会社"},
+    "features": json.load(open(f"{d}/features.json")),
+    "modelConfigs": json.load(open(f"{d}/models.json")),
+}, ensure_ascii=False))
+PYEOF
+de_call "Engine 作成 (${ENGINE_ID})" POST \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines?engineId=${ENGINE_ID}" \
-  -d "{
-    \"displayName\": \"ネクストファイナンス Gemini Enterprise ハンズオン\",
-    \"industryVertical\": \"GENERIC\",
-    \"solutionType\": \"SOLUTION_TYPE_SEARCH\",
-    \"appType\": \"APP_TYPE_INTRANET\",
-    \"dataStoreIds\": ${DS_ARRAY},
-    \"searchEngineConfig\": {
-      \"searchTier\": \"SEARCH_TIER_ENTERPRISE\",
-      \"searchAddOns\": [\"SEARCH_ADD_ON_LLM\"]
-    },
-    \"commonConfig\": {
-      \"companyName\": \"ネクストファイナンス株式会社\"
-    },
-    \"features\": {
-      \"model-selector\": \"FEATURE_STATE_ON\",
-      \"speech-to-text\": \"FEATURE_STATE_ON\",
-      \"bi-directional-audio\": \"FEATURE_STATE_ON\",
-      \"canvas\": \"FEATURE_STATE_ON\",
-      \"disable-canvas\": \"FEATURE_STATE_OFF\",
-      \"canvas-workspace\": \"FEATURE_STATE_ON\",
-      \"canvas-app-builder\": \"FEATURE_STATE_ON\",
-      \"agent-gallery\": \"FEATURE_STATE_ON\",
-      \"prompt-gallery\": \"FEATURE_STATE_ON\",
-      \"notebook-lm\": \"FEATURE_STATE_ON\",
-      \"image-generation\": \"FEATURE_STATE_ON\",
-      \"video-generation\": \"FEATURE_STATE_ON\",
-      \"talk-to-content\": \"FEATURE_STATE_ON\",
-      \"google-drive-upload\": \"FEATURE_STATE_ON\",
-      \"agent-sharing\": \"FEATURE_STATE_ON\"
-    },
-    \"modelConfigs\": {
-      \"gemini-4-argon\": \"MODEL_ENABLED\",
-      \"gemini-3.8-flash\": \"MODEL_ENABLED\",
-      \"gemini-3.6-flash\": \"MODEL_ENABLED\",
-      \"gemini-3.5-flash\": \"MODEL_ENABLED\",
-      \"gemini-3.1-pro-preview\": \"MODEL_ENABLED\",
-      \"gemini-2.5-pro\": \"MODEL_ENABLED\",
-      \"gemini-2.5-flash\": \"MODEL_ENABLED\"
-    }
-  }" >/dev/null || true
+  "$(cat "${ENG_TMP}/create.json")"
 
-sleep 3
+# Engine 作成は非同期 (LRO) のため、取得できるまで最大 60 秒待つ
+for _i in $(seq 1 12); do
+  if curl -s -f -o "${ENG_TMP}/engine.json" -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" "${ENGINE_URL}"; then
+    break
+  fi
+  sleep 5
+done
 
-# Fetch existing Engine state and merge features + modelConfigs + dataStoreIds
-EXISTING_ENGINE_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}" || true)
-
-python3 - <<PYEOF > /tmp/engine_patch_payload.json
-import json
-
+# 4b. 機能・モデルの有効化（dataStoreIds とは別の PATCH にし、片方の失敗に巻き込まれないようにする）
+python3 - "${ENG_TMP}" > "${ENG_TMP}/patch_features.json" <<'PYEOF'
+import json, sys
+d = sys.argv[1]
 try:
-    eng = json.loads('''${EXISTING_ENGINE_JSON}''')
+    eng = json.load(open(f"{d}/engine.json"))
 except Exception:
     eng = {}
-
-ds_ids = json.loads('''${DS_ARRAY}''')
 features = eng.get("features", {}) or {}
-features.update({
-    "model-selector": "FEATURE_STATE_ON",
-    "speech-to-text": "FEATURE_STATE_ON",
-    "bi-directional-audio": "FEATURE_STATE_ON",
-    "canvas": "FEATURE_STATE_ON",
-    "disable-canvas": "FEATURE_STATE_OFF",
-    "canvas-workspace": "FEATURE_STATE_ON",
-    "canvas-app-builder": "FEATURE_STATE_ON",
-    "agent-gallery": "FEATURE_STATE_ON",
-    "prompt-gallery": "FEATURE_STATE_ON",
-    "notebook-lm": "FEATURE_STATE_ON",
-    "image-generation": "FEATURE_STATE_ON",
-    "video-generation": "FEATURE_STATE_ON",
-    "talk-to-content": "FEATURE_STATE_ON",
-    "google-drive-upload": "FEATURE_STATE_ON",
-    "agent-sharing": "FEATURE_STATE_ON",
-})
-
-model_configs = eng.get("modelConfigs", {}) or {}
-model_configs.update({
-    "gemini-4-argon": "MODEL_ENABLED",
-    "gemini-3.8-flash": "MODEL_ENABLED",
-    "gemini-3.6-flash": "MODEL_ENABLED",
-    "gemini-3.5-flash": "MODEL_ENABLED",
-    "gemini-3.1-pro-preview": "MODEL_ENABLED",
-    "gemini-2.5-pro": "MODEL_ENABLED",
-    "gemini-2.5-flash": "MODEL_ENABLED",
-})
-
-payload = {
-    "dataStoreIds": ds_ids,
-    "features": features,
-    "modelConfigs": model_configs,
-}
-print(json.dumps(payload, ensure_ascii=False))
+features.update(json.load(open(f"{d}/features.json")))
+models = eng.get("modelConfigs", {}) or {}
+models.update(json.load(open(f"{d}/models.json")))
+print(json.dumps({"features": features, "modelConfigs": models}, ensure_ascii=False))
 PYEOF
-
-ENGINE_PATCH_RESP=$(curl -s -X PATCH \
+curl -s -X PATCH \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -H "X-Goog-User-Project: ${PROJECT_ID}" \
-  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}?updateMask=dataStoreIds,features,modelConfigs" \
-  -d @/tmp/engine_patch_payload.json || true)
-rm -f /tmp/engine_patch_payload.json
-
-python3 -c "
-import json
+  "${ENGINE_URL}?updateMask=features,modelConfigs" \
+  -d @"${ENG_TMP}/patch_features.json" > "${ENG_TMP}/patch_features_resp.json" || true
+python3 - "${ENG_TMP}/patch_features_resp.json" <<'PYEOF'
+import json, sys
 try:
-    d = json.loads('''${ENGINE_PATCH_RESP}''')
-    f = d.get('features', {})
-    m = d.get('modelConfigs', {})
-    print(f'  [OK] Engine features enabled : model-selector={f.get(\"model-selector\")}, speech-to-text={f.get(\"speech-to-text\")}, canvas={f.get(\"canvas\")} (disable-canvas={f.get(\"disable-canvas\")})')
-    print(f'  [OK] Engine models enabled   : gemini-4-argon={m.get(\"gemini-4-argon\")}, gemini-3.8-flash={m.get(\"gemini-3.8-flash\")}')
+    d = json.load(open(sys.argv[1]))
 except Exception:
-    pass
-"
+    d = {}
+if "error" in d or "features" not in d:
+    e = d.get("error", {})
+    print(f"  [ERROR] Engine 機能・モデル更新 失敗 (HTTP {e.get('code', '-')}) {e.get('status', '')}: {e.get('message', 'Engine が取得できません（上記の Engine 作成エラーを確認してください）')}")
+else:
+    f = d.get("features", {})
+    m = d.get("modelConfigs", {})
+    print(f"  [OK] Engine features enabled : model-selector={f.get('model-selector')}, speech-to-text={f.get('speech-to-text')}, canvas={f.get('canvas')} (disable-canvas={f.get('disable-canvas')})")
+    print(f"  [OK] Engine models enabled   : gemini-4-argon={m.get('gemini-4-argon')}, gemini-3.8-flash={m.get('gemini-3.8-flash')}")
+PYEOF
+
+# 4c. 既存 Engine にデータストアが不足している場合のみ追加（削除はしない）
+curl -s -o "${ENG_TMP}/engine.json" -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" "${ENGINE_URL}" || true
+DS_MERGED=$(python3 - "${ENG_TMP}/engine.json" "${DS_ARRAY}" <<'PYEOF'
+import json, sys
+try:
+    cur = json.load(open(sys.argv[1])).get("dataStoreIds", []) or []
+except Exception:
+    cur = []
+want = json.loads(sys.argv[2])
+missing = [i for i in want if i not in cur]
+print(json.dumps(cur + missing) if missing else "")
+PYEOF
+)
+if [ -n "${DS_MERGED}" ]; then
+  de_call "Engine へのデータストア追加 (${DS_MERGED})" PATCH \
+    "${ENGINE_URL}?updateMask=dataStoreIds" \
+    "{\"dataStoreIds\": ${DS_MERGED}}"
+  curl -s -o "${ENG_TMP}/engine.json" -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" "${ENGINE_URL}" || true
+fi
+
+# 4d. Engine に実際に接続されているデータストアを検証
+LINKED_DS=$(python3 -c 'import json,sys
+try:
+    print(json.dumps(json.load(open(sys.argv[1])).get("dataStoreIds", [])))
+except Exception:
+    print("[]")' "${ENG_TMP}/engine.json")
+echo "  -> Engine (${ENGINE_ID}) に実際に接続されているデータストア: ${LINKED_DS}"
+LINK_CHECK=$(python3 -c 'import json,sys
+ids = json.loads(sys.argv[1])
+miss = []
+if not any("google_mail" in i or i == "gws-gmail-ds" for i in ids): miss.append("Gmail")
+if not any("google_chat" in i or i == "gws-gchat-ds" for i in ids): miss.append("Google Chat")
+print(" / ".join(miss))' "${LINKED_DS}")
+if [ -z "${LINK_CHECK}" ]; then
+  echo "  [OK] Gmail / Google Chat データストアが Engine に接続されています"
+else
+  echo "  [ERROR] ${LINK_CHECK} のデータストアが Engine に接続されていません。"
+  echo "          Console 管理画面 > ［接続されたデータストア］>［新しいデータストアを追加］から手動で追加してください:"
+  echo "          https://console.cloud.google.com/ai/agentspace/locations/global/engines/${ENGINE_ID}/overview?project=${PROJECT_ID}"
+fi
+rm -rf "${ENG_TMP}"
 
 # Explicitly set generativeAnswerConfig.modelVersion on the Engine WidgetConfig
 curl -s -X PATCH \
@@ -1133,10 +1157,10 @@ curl -s -X POST \
 ENGINE_LIST_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines")
 
-TARGET_ENGINES=$(python3 -c "
-import json
+TARGET_ENGINES=$(printf '%s' "${ENGINE_LIST_JSON}" | python3 -c "
+import json, sys
 try:
-    data = json.loads('''${ENGINE_LIST_JSON}''')
+    data = json.load(sys.stdin)
     ids = [e['name'].split('/')[-1] for e in data.get('engines', []) if e.get('solutionType') == 'SOLUTION_TYPE_SEARCH']
     if '${ENGINE_ID}' not in ids:
         ids.append('${ENGINE_ID}')
@@ -1250,10 +1274,10 @@ rm -f /tmp/agents_spec.json /tmp/da_payload_*.json /tmp/register_a2a_*.json /tmp
 
 WIDGET_CFG_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
   "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/widgetConfigs/default_search_widget_config" || true)
-CID=$(python3 -c "
-import json
+CID=$(printf '%s' "${WIDGET_CFG_JSON}" | python3 -c "
+import json, sys
 try:
-    d = json.loads('''${WIDGET_CFG_JSON}''')
+    d = json.load(sys.stdin)
     print(d.get('configId', ''))
 except Exception:
     print('')
@@ -1278,7 +1302,7 @@ echo "    - next_finance_callcenter_agent : コールセンター分析"
 echo "    - next_finance_hr_agent         : 人事・タレント分析"
 echo "    - next_finance_sales_agent      : 営業・マーケROI分析"
 echo " 4. シナリオ2 横断検索データソース ＆ Gmail / Google Chat 実データ投入状況 :"
-echo "    - 接続済データストア一覧 : ${DS_ARRAY}"
+echo "    - 接続済データストア一覧 : ${LINKED_DS:-${DS_ARRAY}}（Engine から取得した実際の接続状況）"
 echo "    - Gmail 実メール配信     : ${GMAIL_SEEDED:-false} (東都ロジスティクス支払期日延長相談スレッド)"
 echo "    - Google Chat 実スペース : ${CHAT_SEEDED:-false} (【審査部×ビリング債権管理】与信・収納モニタリング連携)"
 echo "    - 社内規程 PDF データストア: ${DATASTORE_ID} (通信料金等債権管理および与信運用規程)"
