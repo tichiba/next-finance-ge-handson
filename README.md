@@ -19,6 +19,7 @@ Qwiklabs（`ユーザー名00` で発行された管理者用 `student-xx-...@qw
 * プロジェクト内の全 `student-xx-...@qwiklabs.net` アカウント自動検出＆IAM権限・ライセンス付与
 * **Gmail / Google Chat 実データの自動配信**（初回1回の OAuth 認可により、全受講者アカウントの Gmail 受信トレイへ「東都ロジスティクス支払期日延長相談メール」を送信し、Google Chat スペース「【審査部×ビリング債権管理】与信・収納モニタリング連携」を作成して議論メッセージを投稿）
 * **Gmail コネクタ（`google_mail`）・Google Chat コネクタ（`google_chat`）・社内規程 PDF データストア（`next-finance-internal-docs`）** の作成と Gemini Enterprise エンジンへの接続
+  * ⚠️ Qwiklabs のユーザー（qwiklabs.net）間では Gmail が受信されないため、営業部の相談メールは **メール記録 PDF（`next_finance_sales_email_toto_logistics.pdf`）** として社内規程 PDF とあわせて `next-finance-internal-docs` に常に取り込みます。
 * BigQuery 4データセット（計12テーブル）と 4部門 A2A データ分析エージェントの構築・登録
 
 ```bash

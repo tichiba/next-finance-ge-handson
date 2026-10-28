@@ -186,56 +186,32 @@ curl -s -X PATCH \
 
 sleep 2
 
-if { [ "${GMAIL_SEEDED}" = "true" ] && [ "${CHAT_SEEDED}" = "true" ]; } || [ "${FORCE_POLICY_ONLY:-}" = "1" ]; then
-  echo "  -> Importing ONLY Credit Policy PDF (next_finance_credit_policy.pdf) into ${DATASTORE_ID} so Gmail & Chat connectors are cited..."
-  curl -s -X POST \
-    -H "Authorization: Bearer ${TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "X-Goog-User-Project: ${PROJECT_ID}" \
-    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
-    -d "{
-      \"gcsSource\": {
-        \"inputUris\": [\"gs://${BUCKET_NAME}/scenario2/next_finance_credit_policy.pdf\"],
-        \"dataSchema\": \"content\"
-      },
-      \"reconciliationMode\": \"FULL\"
-    }" >/dev/null || true
-
-  # Also explicitly remove next_finance_email_chat_archive.pdf if it was previously imported
-  DOCS_JSON=$(curl -s -H "Authorization: Bearer ${TOKEN}" -H "X-Goog-User-Project: ${PROJECT_ID}" \
-    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents?pageSize=100" || true)
-  ARCHIVE_DOC_NAMES=$(printf '%s' "${DOCS_JSON}" | python3 -c "
-import json, sys
-try:
-    d = json.load(sys.stdin)
-    for doc in d.get('documents', []):
-        uri = doc.get('content', {}).get('uri', '')
-        if 'next_finance_email_chat_archive' in uri or 'email_chat_archive' in json.dumps(doc):
-            print(doc['name'])
-except Exception:
-    pass
-")
-  for DOC_NAME in ${ARCHIVE_DOC_NAMES}; do
-    curl -s -X DELETE \
-      -H "Authorization: Bearer ${TOKEN}" \
-      -H "X-Goog-User-Project: ${PROJECT_ID}" \
-      "https://discoveryengine.googleapis.com/v1alpha/${DOC_NAME}" >/dev/null || true
-  done
+# Qwiklabs の qwiklabs.net ユーザー間では Gmail が配送されないため（GMAIL_SEEDED=true でも受信されない）、
+# 営業部からの相談メールは「メール記録 PDF」として常に社内文書データストアへ取り込む。
+# Google Chat の実データがある場合はコネクタ経由で参照するため、メール＋チャットのアーカイブ PDF は取り込まない。
+# （FULL 同期のため、取り込み対象に含めなかった過去のドキュメントはデータストアから削除される）
+POLICY_PDF_URI="gs://${BUCKET_NAME}/scenario2/next_finance_credit_policy.pdf"
+EMAIL_PDF_URI="gs://${BUCKET_NAME}/scenario2/next_finance_sales_email_toto_logistics.pdf"
+ARCHIVE_PDF_URI="gs://${BUCKET_NAME}/scenario2/next_finance_email_chat_archive.pdf"
+if [ "${CHAT_SEEDED}" = "true" ] || [ "${FORCE_POLICY_ONLY:-}" = "1" ]; then
+  SCENARIO2_URIS="\"${POLICY_PDF_URI}\", \"${EMAIL_PDF_URI}\""
+  echo "  -> Importing Credit Policy PDF + Sales Email record PDF into ${DATASTORE_ID} (Gmail seeded=${GMAIL_SEEDED}, Chat seeded=${CHAT_SEEDED})..."
 else
-  echo "  -> [Fallback] Gmail (${GMAIL_SEEDED}) or Chat (${CHAT_SEEDED}) not both seeded; importing scenario2/*.pdf into ${DATASTORE_ID} as safety net..."
-  curl -s -X POST \
-    -H "Authorization: Bearer ${TOKEN}" \
-    -H "Content-Type: application/json" \
-    -H "X-Goog-User-Project: ${PROJECT_ID}" \
-    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
-    -d "{
-      \"gcsSource\": {
-        \"inputUris\": [\"gs://${BUCKET_NAME}/scenario2/*.pdf\"],
-        \"dataSchema\": \"content\"
-      },
-      \"reconciliationMode\": \"INCREMENTAL\"
-    }" >/dev/null || true
+  SCENARIO2_URIS="\"${POLICY_PDF_URI}\", \"${EMAIL_PDF_URI}\", \"${ARCHIVE_PDF_URI}\""
+  echo "  -> [Fallback] Chat not seeded (${CHAT_SEEDED}); importing Credit Policy + Sales Email + Email/Chat archive PDFs into ${DATASTORE_ID}..."
 fi
+curl -s -X POST \
+  -H "Authorization: Bearer ${TOKEN}" \
+  -H "Content-Type: application/json" \
+  -H "X-Goog-User-Project: ${PROJECT_ID}" \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/dataStores/${DATASTORE_ID}/branches/0/documents:import" \
+  -d "{
+    \"gcsSource\": {
+      \"inputUris\": [${SCENARIO2_URIS}],
+      \"dataSchema\": \"content\"
+    },
+    \"reconciliationMode\": \"FULL\"
+  }" >/dev/null || true
 
 # ------------------------------------------------------------------------------
 # 3. Register Google Workspace Connectors & DataStores (Gmail & Google Chat)

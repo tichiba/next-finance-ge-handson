@@ -725,7 +725,7 @@
                     <div class="step-number">2</div>
                     <div class="step-meta">
                         <div>シナリオ1：Gemini Notebook</div>
-                        <div class="step-time">約 10 分</div>
+                        <div class="step-time">約 15 分</div>
                     </div>
                 </li>
                 <li class="step-item" onclick="showStep(2)">
@@ -739,14 +739,14 @@
                     <div class="step-number">4</div>
                     <div class="step-meta">
                         <div>シナリオ3：データ分析＆レポート作成</div>
-                        <div class="step-time">約 18 分</div>
+                        <div class="step-time">約 10 分</div>
                     </div>
                 </li>
                 <li class="step-item" onclick="showStep(4)">
                     <div class="step-number">5</div>
                     <div class="step-meta">
                         <div>自由探索：4部門エージェント応用</div>
-                        <div class="step-time">ボーナス</div>
+                        <div class="step-time">約 10 分</div>
                     </div>
                 </li>
             </ul>
@@ -778,22 +778,27 @@
                         <tr>
                             <td><strong>導入</strong><br>5分</td>
                             <td><strong>Gemini Enterprise ログイン＆画面確認</strong></td>
-                            <td>Gemini Enterprise Web アプリへログインし、チャット欄・Gemini Notebook・エージェントの画面構成を確認します。</td>
+                            <td>Gemini Enterprise Web アプリへログインし、出力言語を日本語に設定して、チャット欄・エージェントの画面構成を確認します。</td>
                         </tr>
                         <tr>
-                            <td><strong>シナリオ 1</strong><br>10分</td>
+                            <td><strong>シナリオ 1</strong><br>15分</td>
                             <td><strong>【Gemini Notebook】<br>経営戦略・業界動向のインプットと要点整理</strong></td>
-                            <td>① 統合報告書と決算・IR資料のURLを追加し、スライド資料と音声解説を生成<br>② 生成の待ち時間に、2資料を横断して戦略・財務・事業機会をQA<br>③ 完成したスライド資料の閲覧と音声解説を試聴</td>
+                            <td>① 統合報告書と決算・IR資料のURLを追加し、音声解説とスライド資料を生成<br>② 生成の待ち時間に、2資料を横断して戦略・財務・事業機会をQA<br>③ 完成したスライド資料の閲覧と音声解説を試聴</td>
                         </tr>
                         <tr>
                             <td><strong>シナリオ 2</strong><br>12分</td>
                             <td><strong>【GE + GWS横断検索】<br>大口取引先の状況把握と社内規程の確認</strong></td>
-                            <td>大口取引先「東都ロジスティクス」からの支払期日延長相談について、営業メール・審査部チャット・債権管理規程PDFを一括検索し、経緯と決裁基準を一覧表に自動整理します。</td>
+                            <td>大口取引先「東都ロジスティクス」からの支払期日延長相談について、営業部の相談メール記録・審査部チャット・債権管理規程PDFを一括検索し、経緯と決裁基準を一覧表に自動整理します。</td>
                         </tr>
                         <tr>
-                            <td><strong>シナリオ 3</strong><br>18分</td>
+                            <td><strong>シナリオ 3</strong><br>10分</td>
                             <td><strong>【GE + AIエージェント】<br>未収データ分析と経営会議レポート作成</strong></td>
                             <td>① <span class="mention-chip">@請求・入金・与信分析</span> で月次回収率推移と未収リスク業種・ランクをグラフ化<br>② 要注意法人トップ10社の特定と、今後半年間の将来予測＆対策シミュレーション<br>③ シナリオ2の経緯と統合し、経営会議レポートと報告スライドを出力</td>
+                        </tr>
+                        <tr>
+                            <td><strong>自由探索</strong><br>10分</td>
+                            <td><strong>【4部門エージェント応用】</strong></td>
+                            <td>コールセンター・人事・営業マーケの各データ分析エージェントで、散布図・円グラフ・ツリーマップなど多彩な可視化を試します。</td>
                         </tr>
                     </tbody>
                 </table>
@@ -812,8 +817,16 @@
 
                 <div class="note">
                     <strong>💡 画面の確認：</strong><br>
-                    ログイン後、画面中央に<strong>チャット入力欄</strong>、左メニューに<strong>「Gemini Notebook」「エージェント」</strong>が表示されていることを確認します。
+                    ログイン後、画面中央に<strong>チャット入力欄</strong>、左メニューに<strong>「エージェント（Agents）」</strong>が表示されていることを確認します。<br>
+                    ※ Gemini Notebook は初期状態では左メニューに表示されません。シナリオ1で一度開くと、以降は左メニューに表示されます。
                 </div>
+
+                <h3><span class="material-icons">translate</span> Step 1-2：出力言語を日本語に設定</h3>
+                <p>回答が英語で返ってこないよう、最初に出力言語を設定します。</p>
+                <ol>
+                    <li>画面右上の <strong>「⚙️（設定）」</strong> をクリックします。</li>
+                    <li><strong>「Output Language（出力言語）」</strong> で <strong>「日本語」</strong> を選択します。</li>
+                </ol>
 
                 <div class="nav-buttons">
                     <div></div>
@@ -824,19 +837,19 @@
             </div>
 
             <!-- =========================================================
-                 STEP 2: シナリオ1（10分）Gemini Notebook
+                 STEP 2: シナリオ1（15分）Gemini Notebook
                  ========================================================= -->
             <div class="step-content" id="step-1">
                 <div class="step-header-banner">
                     <h2 class="step-title">2. シナリオ1：【Gemini Notebook】経営戦略・業界動向のインプットと要点整理</h2>
-                    <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：10分</span>
+                    <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：15分</span>
                 </div>
 
-                <p>統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>スライド資料・音声解説の自動生成</strong>と、<strong>複数資料を横断した引用付きQA</strong>を体験します。</p>
+                <p>統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>音声解説・スライド資料の自動生成</strong>と、<strong>複数資料を横断した引用付きQA</strong>を体験します。</p>
 
                 <h3><span class="material-icons">add_link</span> Step 1-1：Notebook の新規作成とソースの追加</h3>
                 <ol>
-                    <li>左メニューから <strong>「Gemini Notebook」</strong> を開き、<strong>［＋ 新規作成］</strong>をクリックします。</li>
+                    <li>左メニューの <strong>「エージェント（Agents）」</strong> から <strong>「Gemini Notebook」</strong> を選択して開き、<strong>［＋ 新規作成］</strong>をクリックします（一度開くと、以降は左メニューに「Gemini Notebook」が直接表示されます）。</li>
                     <li>ソース追加画面で <strong>「ウェブサイト」</strong> を選択します。</li>
                     <li>以下の2つの資料の <strong>［URLをコピー］</strong> ボタンをクリックし、URLを貼り付けてソースに追加します。</li>
                 </ol>
@@ -881,37 +894,23 @@
                     </div>
                 </div>
 
-                <h3><span class="material-icons">auto_awesome</span> Step 1-2：スライド資料と音声解説の生成</h3>
-
-                <h4>① スライド資料の生成</h4>
-                <p>画面右側の <strong>Studio パネル</strong> にある <strong>「スライド資料」（図①）</strong> をクリックします。カスタマイズなしでそのまま自動生成が始まります。</p>
-                <div class="screenshot-card" style="max-width: 380px; margin: 12px 0 24px;">
-                    <img src="./images/studio_panel.png" alt="① スライド資料をクリック">
+                <h3><span class="material-icons">auto_awesome</span> Step 1-2：音声解説とスライド資料の生成</h3>
+                <p>画面右側の <strong>Studio パネル</strong> から、<strong>① 音声解説</strong> → <strong>② スライド資料</strong> の順に生成を開始します。</p>
+                <div class="screenshot-card" style="max-width: 420px; margin: 12px 0 24px;">
+                    <img src="./images/studio_panel.png" alt="Studio パネル：① 音声解説、② スライド資料">
                 </div>
 
-                <h4>② 音声解説の生成</h4>
-                <p>続けて <strong>「音声解説」</strong> 右上の <strong>「⋮」（図②）</strong> をクリックし、<strong>「カスタマイズ」</strong> を選択して以下のプロンプトを入力します。</p>
-                <div class="screenshot-card" style="max-width: 380px; margin: 12px 0 16px;">
-                    <img src="./images/audio_customize.png" alt="② 音声解説の「⋮」からカスタマイズを選択">
-                </div>
+                <h4>① 音声解説の生成</h4>
+                <p><strong>「音声解説」（図①）</strong> をクリックすると「音声解説をカスタマイズ」のポップアップが表示されます。<strong>言語</strong>が <strong>「日本語」</strong> になっていることを確認し、<strong>長さ</strong>で <strong>「短め」</strong> を選択して <strong>［生成］</strong> をクリックします（下の入力欄は空欄のままで構いません）。</p>
 
-                <!-- 音声解説カスタマイズプロンプト（1つに統一） -->
-                <div class="prompt-card">
-                    <div class="prompt-card-header">
-                        <div class="prompt-label">
-                            <span class="material-icons">mic</span>
-                            音声解説のカスタマイズ用プロンプト
-                        </div>
-                        <button class="copy-btn" onclick="copyFromElement('prompt-s1-audio-slide', this)">
-                            <span class="material-icons">content_copy</span> プロンプトをコピー
-                        </button>
-                    </div>
-                    <div class="prompt-body" id="prompt-s1-audio-slide">1. アップロードした2資料をもとに、重点戦略と事業課題を議論してください。
-2. 企画・営業担当者が短時間で要点を把握できるよう、分かりやすい対談形式で解説してください。</div>
+                <h4>② スライド資料の生成</h4>
+                <p>続けて <strong>「スライド資料」（図②）</strong> をクリックします。カスタマイズなしでそのまま自動生成が始まります。</p>
+                <div class="tip">
+                    <strong>⏱ 生成時間の目安：</strong> スライド資料は約5分、音声解説は5〜10分かかります。待っている間に次の Step 1-3 を進めてください。
                 </div>
 
                 <h3><span class="material-icons">question_answer</span> Step 1-3：2資料を横断したQA</h3>
-                <p>スライド資料と音声解説が生成されている間に、中央のチャット欄に以下のプロンプトを貼り付けて、さまざまな切り口から2つの資料を横断分析してみましょう。</p>
+                <p>音声解説とスライド資料が生成されている間に、中央のチャット欄に以下のプロンプトを貼り付けて、さまざまな切り口から2つの資料を横断分析してみましょう。</p>
 
                 <!-- 例①：戦略×役割の整理 -->
                 <div class="prompt-card">
@@ -955,8 +954,8 @@
                     <div class="prompt-body" id="prompt-s1-qa-3">2つの資料に記載されている「デジタル化・AI活用」「キャッシュフロー創出」「債権・財務管理」の観点から、今後さらに強化すべきビジネス機会と注意すべき事業リスクをそれぞれ3点ずつ提案してください。</div>
                 </div>
 
-                <h3><span class="material-icons">headphones</span> Step 1-4：スライド資料と音声解説の確認</h3>
-                <p>右側 Studio パネルの下部に <strong>スライド資料</strong> と <strong>音声解説</strong> が完成したら、クリックしてスライドの閲覧や日本語対談番組の試聴を行います。</p>
+                <h3><span class="material-icons">headphones</span> Step 1-4：音声解説とスライド資料の確認</h3>
+                <p>右側 Studio パネルの下部に <strong>音声解説</strong> と <strong>スライド資料</strong> が完成したら、クリックして日本語対談番組の試聴やスライドの閲覧を行います。</p>
 
                 <div class="nav-buttons">
                     <button class="btn btn-prev" onclick="showStep(0)">
@@ -981,8 +980,8 @@
                 情報がメール・チャット・規程PDFのどこにあるか意識せず、同僚に話しかけるような<strong>短い一言ずつ</strong>で状況を深掘りし、最後に一覧表へ整理させます。</p>
 
                 <div class="note">
-                    <strong>🔑 初回検索時の連携承認（Authorize）について：</strong><br>
-                    皆さまのアカウントには、営業部からの相談メール（<a href="https://mail.google.com" target="_blank" rel="noopener">Gmail</a>）と、審査部・債権管理室の議論スペース（<a href="https://chat.google.com" target="_blank" rel="noopener">Google Chat</a>）が実際に届いています。プロンプト実行時に <strong>Gmail</strong> や <strong>Google Chat</strong> の <strong>［承認（Authorize）］</strong> ボタンが表示された場合は、クリックしてアクセスを許可してください。
+                    <strong>🔑 参照される社内情報と連携承認（Authorize）について：</strong><br>
+                    営業部からの相談メールは<strong>社内文書（メール記録）</strong>として、審査部・債権管理室の議論は <a href="https://chat.google.com" target="_blank" rel="noopener">Google Chat</a> のスペースとして用意されています。プロンプト実行時に <strong>Google Chat</strong> などの <strong>［承認（Authorize）］</strong> ボタンが表示された場合は、クリックしてアクセスを許可してください。
                 </div>
 
                 <h3><span class="material-icons">mail_outline</span> Step 2-1：まずは取引先からの相談経緯を聞く</h3>
@@ -1037,11 +1036,12 @@
                 </div>
 
                 <div class="note">
-                    <strong>📊 3ステップの対話で抽出・整理される重要ファクト：</strong>
+                    <strong>📊 期待される出力のポイント（表現や表の構成は実行のたびに変わります）：</strong>
                     <ul style="margin-top:6px; margin-bottom:0;">
-                        <li><strong>対象取引先・経緯（Step 2-1）</strong>：東都ロジスティクス（契約4,850回線、月間請求額4,800万円、与信ランクC1）。過去6ヶ月間に2回の引落不能・遅延履歴あり。燃料高騰等を理由に30日→60日サイトへの延長を要請。</li>
-                        <li><strong>現場の懸念点（Step 2-2）</strong>：物流・建設セクターのランクC1/C2法人から同種のサイト延長相談が今月他に6社急増。個人回線でも払込票切替層の未収率が14.8%へ上昇。</li>
-                        <li><strong>規程上の決裁基準（Step 2-3）</strong>：<strong>第14条</strong>により「月間請求3,000万円以上」かつ「直近6ヶ月遅延2回以上」のため営業本部長決裁は不可、<strong>経営会議への付議・承認が必須</strong>。<strong>第18条</strong>により新規車載IoT回線800回線の増設は<strong>原則全面凍結</strong>、未使用与信枠20%圧縮＋債権保証の付保が必要。</li>
+                        <li><strong>これまでの経緯（Step 2-1）</strong>：東都ロジスティクスは契約4,850回線・月間請求額約4,800万円の大口契約先。直近6ヶ月で2回の入金遅延があり、与信ランクは「C1（要注意）」。燃料費高騰等を理由に、支払期日を翌月末（30日サイト）から翌々月末（60日サイト）へ延長したいと要請。</li>
+                        <li><strong>現場の懸念点（Step 2-2）</strong>：物流・建設セクターのランクC1/C2法人から、同種の支払サイト延長相談が他に6社相次いでいる。個人回線でも、紙の払込票に切り替わった層の未収率が14.8%に上昇。</li>
+                        <li><strong>決裁権限者（Step 2-3／規程第14条）</strong>：「月間請求額3,000万円以上」<strong>または</strong>「直近6ヶ月で2回以上遅延した要注意先（C1/C2）」は、審査部長とビリング事業本部長の合議のうえ<strong>経営会議（またはリスク管理委員会）への付議・承認が必須</strong>。同社は両方に該当する。</li>
+                        <li><strong>新規回線増設の取り扱い（Step 2-3／規程第18条）</strong>：支払猶予の相談を受理した時点で、車載IoT回線800回線の追加などの新規増設は<strong>原則全面凍結</strong>。あわせて与信限度額の20%圧縮と、前受保証金（月間請求額の1ヶ月分以上）またはファクタリング（売掛債権保証）の付保が経営会議付議の前提条件となる。</li>
                     </ul>
                 </div>
 
@@ -1056,12 +1056,12 @@
             </div>
 
             <!-- =========================================================
-                 STEP 4: シナリオ3（18分）データ分析エージェント＆レポート・Canvas出力
+                 STEP 4: シナリオ3（10分）データ分析エージェント＆レポート・Canvas出力
                  ========================================================= -->
             <div class="step-content" id="step-3">
                 <div class="step-header-banner">
                     <h2 class="step-title">4. シナリオ3：【GE + AIエージェント】未収データ分析と経営会議レポート作成</h2>
-                    <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：18分</span>
+                    <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：10分</span>
                 </div>
 
                 <p>シナリオ2で「物流・建設セクターで同様の遅延相談が増えている」という現場の懸念が判明しました。<br>
@@ -1069,17 +1069,18 @@
 
                 <div class="tip">
                     <strong>💡 エージェントの呼び出し方：</strong><br>
-                    シナリオ2を実行した<strong>同じメインチャットの入力欄</strong>で半角の <code class="inline">@</code> を入力し、候補から <strong><span class="mention-chip">@請求・入金・与信分析</span></strong> をクリックして選択したあと、下のプロンプトをコピーして貼り付けます。
+                    シナリオ2を実行した<strong>同じメインチャットの入力欄</strong>で半角の <code class="inline">@</code> を入力し、候補から <strong><span class="mention-chip">@請求・入金・与信分析</span></strong> をクリックして選択したあと、下のプロンプトをコピーして貼り付けます。<br>
+                    初回の呼び出し時にエージェントの <strong>［承認（Authorize）］</strong> ボタンが表示された場合は、クリックしてアクセスを許可してください。
                 </div>
 
                 <h3><span class="material-icons">show_chart</span> Step 3-1：全体傾向の把握</h3>
-                <p>まずは全社の月次請求・入金・回収率の推移と、どの業種・与信ランクに未収リスクが集中しているかを可視化します。</p>
+                <p>まずは全社の月次請求・入金・回収率の推移と、どの業種・与信ランクに未収リスクが集中しているかを可視化します。グラフが確実に生成されるよう、<strong>2つのプロンプトに分けて順番に</strong>送信します。</p>
 
                 <div class="prompt-card">
                     <div class="prompt-card-header">
                         <div class="prompt-label">
                             <span class="material-icons">insights</span>
-                            ① 全体傾向の把握プロンプト
+                            ①-a 月次推移の可視化プロンプト
                         </div>
                         <button class="copy-btn" onclick="copyFromElement('prompt-s3-step1-slide', this)">
                             <span class="material-icons">content_copy</span> プロンプトをコピー
@@ -1089,9 +1090,24 @@
                         <span class="mention-chip">@請求・入金・与信分析</span>
                         <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
                     </div>
-                    <div class="prompt-body" id="prompt-s3-step1-slide">「請求・入金・顧客与信」のデータを掛け合わせ、以下を可視化してください。
-(1) 2026年4月〜9月の月次請求額・入金済額・未収残高・回収率の推移（折れ線グラフ）
-(2) 未収リスクが拡大している「業種×与信ランク」別の未収残高・遅延傾向（棒グラフと表）</div>
+                    <div class="prompt-body" id="prompt-s3-step1-slide">「請求・入金・顧客与信」のデータを掛け合わせ、2026年4月〜9月の月次請求額・入金済額・未収残高・回収率の推移を折れ線グラフで可視化してください。</div>
+                </div>
+
+                <div class="prompt-card">
+                    <div class="prompt-card-header">
+                        <div class="prompt-label">
+                            <span class="material-icons">insights</span>
+                            ①-b 業種×与信ランク別の未収リスク可視化プロンプト
+                        </div>
+                        <button class="copy-btn" onclick="copyFromElement('prompt-s3-step1b-slide', this)">
+                            <span class="material-icons">content_copy</span> プロンプトをコピー
+                        </button>
+                    </div>
+                    <div class="mention-bar">
+                        <span class="mention-chip">@請求・入金・与信分析</span>
+                        <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
+                    </div>
+                    <div class="prompt-body" id="prompt-s3-step1b-slide">続けて、未収リスクが拡大している「業種×与信ランク」別の未収残高と遅延傾向を、棒グラフと表で可視化してください。</div>
                 </div>
 
                 <h3><span class="material-icons">bar_chart</span> Step 3-2：要注意の大口取引先トップ10社の特定</h3>
@@ -1135,12 +1151,12 @@
                 </div>
 
                 <h3><span class="material-icons">description</span> Step 3-4：経営会議レポートと報告スライドの出力</h3>
-                <p>最後に、<strong>シナリオ2で確認した東都ロジスティクスの経緯・決裁基準</strong>と、<strong>シナリオ3の全社データ分析・将来予測結果</strong>を統合し、経営会議に付議するレポートとプレゼンスライドを作成します（ここでは <code class="inline">@</code> メンションは不要です）。</p>
+                <p>最後に、<strong>シナリオ2で確認した東都ロジスティクスの経緯・決裁基準</strong>と、<strong>シナリオ3の全社データ分析・将来予測結果</strong>を統合し、経営会議に付議するレポートとプレゼンスライドを作成します。</p>
 
+                <h4>(A) 統合レポートの作成</h4>
                 <ol>
-                    <li>メインチャットの入力欄に以下の<strong>「① 統合レポート作成プロンプト」</strong>を貼り付けて実行します。</li>
-                    <li>レポートが生成されたら、回答下部の <strong>［Google ドキュメントにエクスポート］</strong> アイコンをクリックして保存します。</li>
-                    <li>続けて、同じチャット入力欄の下部にある <strong>［ツール］→［Canvas］</strong> を選択し、<strong>「② 報告用スライド生成プロンプト」</strong>を送信します。</li>
+                    <li>入力欄に前のプロンプトの <span class="mention-chip">@請求・入金・与信分析</span> が残っている場合は、チップの <strong>［✕］</strong> をクリックして外します（ここでは <code class="inline">@</code> メンションは不要です）。</li>
+                    <li>メインチャットの入力欄に、以下の<strong>「① 経営会議向け 統合対策レポート作成プロンプト」</strong>を貼り付けて実行します。</li>
                 </ol>
 
                 <!-- スライド P.32 ① 統合レポート生成プロンプト -->
@@ -1157,6 +1173,16 @@
                     <div class="prompt-body" id="prompt-s3-step3-report">これまでの社内規程・メール確認結果と、先ほどのデータ分析および将来予測の結果（回収率推移・要注意トップ10社・半年後の将来予測と保全試算）を統合し、経営会議向けの『大口契約先の支払条件変更決裁および全社債権リスク対策レポート』を作成してください。</div>
                 </div>
 
+                <ol start="3">
+                    <li>レポートが生成されたら、回答下部のアイコンから <strong>［PDF 形式でダウンロード］</strong> を選択して保存します。</li>
+                </ol>
+
+                <h4>(B) 報告用スライドの作成</h4>
+                <ol start="4">
+                    <li>同じチャット入力欄の下部にある <strong>［ツール］→［Canvas］</strong> を選択して、Canvas を有効にします。</li>
+                    <li>以下の<strong>「② 経営会議報告用スライド生成プロンプト」</strong>を貼り付けて送信します。</li>
+                </ol>
+
                 <!-- スライド P.32 ② Canvas スライド生成プロンプト -->
                 <div class="prompt-card">
                     <div class="prompt-card-header">
@@ -1171,24 +1197,12 @@
                     <div class="prompt-body" id="prompt-s3-step3-canvas">今の分析結果をもとに、来週の経営会議で発表するための報告用プレゼンテーションスライドを5枚構成（1.エグゼクティブサマリ、2.月次回収率の推移と課題、3.要注意法人トップ10社の未収状況、4.今後半年間の将来予測と債権保全シミュレーション、5.今後のアクションプラン）で作成してください。</div>
                 </div>
 
-                <!-- 推奨ドキュメント名コピー（スライド P.33） -->
-                <div class="resource-grid">
-                    <div class="resource-card">
-                        <div class="resource-header">
-                            <div class="resource-title">
-                                <span class="material-icons" style="color:var(--accent-green);">drive_file_rename_outline</span>
-                                出力した Google ドキュメントの推奨タイトル
-                            </div>
-                        </div>
-                        <div class="url-row">
-                            <span class="url-text">[社内報告] 大口契約先の支払条件変更決裁および全社ビリング債権リスク対策レポート</span>
-                            <div class="url-actions">
-                                <button class="copy-btn" onclick="copyText('[社内報告] 大口契約先の支払条件変更決裁および全社ビリング債権リスク対策レポート', this)">
-                                    <span class="material-icons">content_copy</span> タイトルをコピー
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <ol start="6">
+                    <li>右側の Canvas ペインに生成されたスライドを確認し、右上の <strong>［エクスポート］</strong> から <strong>［PDF］</strong> または <strong>［PowerPoint（PPTX）］</strong> を選択して保存します。</li>
+                </ol>
+
+                <div class="note">
+                    <strong>💡 補足：</strong> 本ハンズオン環境は Google Drive と連携していないため、Google ドキュメント／Google スライドへの直接エクスポートは表示されません。PDF などのファイル形式で保存してください。
                 </div>
 
                 <div class="nav-buttons">
@@ -1207,7 +1221,7 @@
             <div class="step-content" id="step-4">
                 <div class="step-header-banner">
                     <h2 class="step-title">5. 自由探索：4部門データ分析エージェント応用体験</h2>
-                    <span class="duration-pill"><span class="material-icons" style="font-size:15px;">auto_awesome</span> 自由探索・ボーナス</span>
+                    <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：約10分（自由探索）</span>
                 </div>
 
                 <p>本日のハンズオン環境には、シナリオ3で使用した「🏦 ① 請求・入金・与信分析」に加え、<strong>「🎧 ② コールセンター分析」「👥 ③ 人事・タレント分析」「📈 ④ 営業・マーケROI分析」</strong>の計4つの部門別データ分析エージェントが構築されています。<br>
@@ -1308,6 +1322,10 @@
                         <span class="mention-hint">← チャット欄で <code>@</code> を入力して選択</span>
                     </div>
                     <div class="prompt-body" id="prompt-bonus-sales1">マーケティング施策について、X軸に「投下費用」、Y軸に「創出商談金額」をとった散布図を描画し、高効率チャネルを特定してください。あわせて、2026年4月〜9月の獲得チャネル種別ごとの商談金額推移を積み上げ面グラフで可視化してください。</div>
+                </div>
+
+                <div class="tip">
+                    <strong>💡 ② の実行前に：</strong> チャット入力欄の下部にある <strong>［ツール］→［Canvas］</strong> を選択して Canvas を有効にしてから、下のプロンプトを送信してください（<code class="inline">@</code> メンションは不要です。残っている場合はチップの［✕］で外します）。
                 </div>
 
                 <div class="prompt-card secondary">
