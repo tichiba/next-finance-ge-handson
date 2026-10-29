@@ -562,6 +562,14 @@ curl -s -X PATCH \
     }
   }" >/dev/null || true
 
+# Enable Web Grounding (Google Search) on default_assistant so Canvas slides can use web images
+de_call "Assistant Web Grounding 有効化 (${ENGINE_ID}/assistants/default_assistant)" PATCH \
+  "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${ENGINE_ID}/assistants/default_assistant?updateMask=webGroundingType,defaultWebGroundingToggleOff" \
+  '{
+    "webGroundingType": "WEB_GROUNDING_TYPE_GOOGLE_SEARCH",
+    "defaultWebGroundingToggleOff": false
+  }'
+
 # ------------------------------------------------------------------------------
 # 5. Create & Publish 4 BigQuery Conversational Analytics Data Agents
 #    (with Concise 9-10 char DisplayNames, Japanese Column Descriptions & Golden SQL)
@@ -1162,6 +1170,16 @@ for TARGET_ENG in ${TARGET_ENGINES}; do
         }
       }
     }" >/dev/null || true
+
+  curl -s -X PATCH \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${TARGET_ENG}/assistants/default_assistant?updateMask=webGroundingType,defaultWebGroundingToggleOff" \
+    -d '{
+      "webGroundingType": "WEB_GROUNDING_TYPE_GOOGLE_SEARCH",
+      "defaultWebGroundingToggleOff": false
+    }' >/dev/null || true
 
   curl -s \
     -H "Authorization: Bearer ${TOKEN}" \
