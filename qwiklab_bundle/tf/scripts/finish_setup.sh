@@ -452,7 +452,11 @@ print(json.dumps({
     "solutionType": "SOLUTION_TYPE_SEARCH",
     "appType": "APP_TYPE_INTRANET",
     "dataStoreIds": json.loads(sys.argv[2]),
-    "searchEngineConfig": {"searchTier": "SEARCH_TIER_ENTERPRISE", "searchAddOns": ["SEARCH_ADD_ON_LLM"]},
+    "searchEngineConfig": {
+        "searchTier": "SEARCH_TIER_ENTERPRISE",
+        "searchAddOns": ["SEARCH_ADD_ON_LLM"],
+        "requiredSubscriptionTier": "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT",
+    },
     "commonConfig": {"companyName": "ネクストファイナンス株式会社"},
     "features": json.load(open(f"{d}/features.json")),
     "modelConfigs": json.load(open(f"{d}/models.json")),
@@ -1170,6 +1174,17 @@ for TARGET_ENG in ${TARGET_ENGINES}; do
         }
       }
     }" >/dev/null || true
+
+  curl -s -X PATCH \
+    -H "Authorization: Bearer ${TOKEN}" \
+    -H "Content-Type: application/json" \
+    -H "X-Goog-User-Project: ${PROJECT_ID}" \
+    "https://discoveryengine.googleapis.com/v1alpha/projects/${PROJECT_ID}/locations/global/collections/default_collection/engines/${TARGET_ENG}?updateMask=searchEngineConfig.requiredSubscriptionTier" \
+    -d '{
+      "searchEngineConfig": {
+        "requiredSubscriptionTier": "SUBSCRIPTION_TIER_SEARCH_AND_ASSISTANT"
+      }
+    }' >/dev/null || true
 
   curl -s -X PATCH \
     -H "Authorization: Bearer ${TOKEN}" \
