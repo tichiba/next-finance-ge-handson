@@ -778,12 +778,12 @@
                         <tr>
                             <td><strong>導入</strong><br>5分</td>
                             <td><strong>Gemini Enterprise ログイン＆画面確認</strong></td>
-                            <td>Gemini Enterprise Web アプリへログインし、出力言語を日本語に設定して、チャット欄・エージェントの画面構成を確認します。</td>
+                            <td>Gemini Enterprise Web アプリへログインし、チャット欄・エージェントの画面構成を確認します。</td>
                         </tr>
                         <tr>
                             <td><strong>シナリオ 1</strong><br>15分</td>
                             <td><strong>【Gemini Notebook】<br>経営戦略・業界動向のインプットと要点整理</strong></td>
-                            <td>① 統合報告書と決算・IR資料のURLを追加し、音声解説とスライド資料を生成<br>② 生成の待ち時間に、2資料を横断して戦略・財務・事業機会をQA<br>③ 完成したスライド資料の閲覧と音声解説を試聴</td>
+                            <td>① 出力言語を日本語に設定し、統合報告書と決算・IR資料のURLを追加<br>② 2資料を横断して戦略・財務・事業機会をチャットでQA<br>③ 音声解説とスライド資料を生成（待ち時間にシナリオ2以降を先に進行し、完成後に試聴・閲覧）</td>
                         </tr>
                         <tr>
                             <td><strong>シナリオ 2</strong><br>12分</td>
@@ -803,7 +803,7 @@
                     </tbody>
                 </table>
 
-                <h3><span class="material-icons">login</span> Step 1-1：Gemini Enterprise へのログイン</h3>
+                <h3><span class="material-icons">login</span> Gemini Enterprise へのログイン</h3>
                 <ol>
                     <li>下のボタンから <strong>Gemini Enterprise Web アプリ</strong> を開きます。</li>
                     <li>ログイン画面が表示されたら、講師から配布された <strong>ID（<code class="inline">student-xx-xxxxxxxxxxxx@qwiklabs.net</code>）</strong> と <strong>パスワード</strong> でログインします。</li>
@@ -817,16 +817,8 @@
 
                 <div class="note">
                     <strong>💡 画面の確認：</strong><br>
-                    ログイン後、画面中央に<strong>チャット入力欄</strong>、左メニューに<strong>「エージェント（Agents）」</strong>が表示されていることを確認します。<br>
-                    ※ Gemini Notebook は初期状態では左メニューに表示されません。シナリオ1で一度開くと、以降は左メニューに表示されます。
+                    ログイン後、画面中央に<strong>チャット入力欄</strong>、左メニューに<strong>「エージェント（Agents）」</strong>が表示されていることを確認します。
                 </div>
-
-                <h3><span class="material-icons">translate</span> Step 1-2：出力言語を日本語に設定</h3>
-                <p>回答が英語で返ってこないよう、最初に出力言語を設定します。</p>
-                <ol>
-                    <li>画面右上の <strong>「⚙️（設定）」</strong> をクリックします。</li>
-                    <li><strong>「Output Language（出力言語）」</strong> で <strong>「日本語」</strong> を選択します。</li>
-                </ol>
 
                 <div class="nav-buttons">
                     <div></div>
@@ -845,12 +837,13 @@
                     <span class="duration-pill"><span class="material-icons" style="font-size:15px;">timer</span> 所要時間：15分</span>
                 </div>
 
-                <p>統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>音声解説・スライド資料の自動生成</strong>と、<strong>複数資料を横断した引用付きQA</strong>を体験します。</p>
+                <p>統合報告書や決算・IR資料を <strong>Gemini Notebook</strong> に投入し、<strong>複数資料を横断した引用付きQA</strong>と、<strong>音声解説・スライド資料の自動生成</strong>を体験します。</p>
 
                 <h3><span class="material-icons">add_link</span> Step 1-1：Notebook の新規作成とソースの追加</h3>
                 <ol>
-                    <li>左メニューの <strong>「エージェント（Agents）」</strong> から <strong>「Gemini Notebook」</strong> を選択して開き、<strong>［＋ 新規作成］</strong>をクリックします（一度開くと、以降は左メニューに「Gemini Notebook」が直接表示されます）。</li>
-                    <li>ソース追加画面で <strong>「ウェブサイト」</strong> を選択します。</li>
+                    <li>左メニューの <strong>「エージェント（Agents）」</strong> から <strong>「Gemini Notebook」</strong> を選択して開きます（一度開くと、以降は左メニューに「Gemini Notebook」が直接表示されます）。</li>
+                    <li>回答が英語で返ってこないよう、画面右上の <strong>「⚙️（設定）」</strong> をクリックし、<strong>「Output Language（出力言語）」</strong> で <strong>「日本語」</strong> を選択します。</li>
+                    <li><strong>［＋ 新規作成］</strong>をクリックし、ソース追加画面で <strong>「ウェブサイト」</strong> を選択します。</li>
                     <li>以下の2つの資料の <strong>［URLをコピー］</strong> ボタンをクリックし、URLを貼り付けてソースに追加します。</li>
                 </ol>
 
@@ -894,23 +887,8 @@
                     </div>
                 </div>
 
-                <h3><span class="material-icons">auto_awesome</span> Step 1-2：音声解説とスライド資料の生成</h3>
-                <p>画面右側の <strong>Studio パネル</strong> から、<strong>① 音声解説</strong> → <strong>② スライド資料</strong> の順に生成を開始します。</p>
-                <div class="screenshot-card" style="max-width: 420px; margin: 12px 0 24px;">
-                    <img src="./images/studio_panel.png" alt="Studio パネル：① 音声解説、② スライド資料">
-                </div>
-
-                <h4>① 音声解説の生成</h4>
-                <p><strong>「音声解説」（図①）</strong> をクリックすると「音声解説をカスタマイズ」のポップアップが表示されます。<strong>言語</strong>が <strong>「日本語」</strong> になっていることを確認し、<strong>長さ</strong>で <strong>「短め」</strong> を選択して <strong>［生成］</strong> をクリックします（下の入力欄は空欄のままで構いません）。</p>
-
-                <h4>② スライド資料の生成</h4>
-                <p>続けて <strong>「スライド資料」（図②）</strong> をクリックします。カスタマイズなしでそのまま自動生成が始まります。</p>
-                <div class="tip">
-                    <strong>⏱ 生成時間の目安：</strong> スライド資料は約5分、音声解説は5〜10分かかります。待っている間に次の Step 1-3 を進めてください。
-                </div>
-
-                <h3><span class="material-icons">question_answer</span> Step 1-3：2資料を横断したQA</h3>
-                <p>音声解説とスライド資料が生成されている間に、中央のチャット欄に以下のプロンプトを貼り付けて、さまざまな切り口から2つの資料を横断分析してみましょう。</p>
+                <h3><span class="material-icons">question_answer</span> Step 1-2：2資料を横断したQA</h3>
+                <p>中央のチャット欄に以下のプロンプトを貼り付けて、さまざまな切り口から2つの資料を横断分析してみましょう。</p>
 
                 <!-- 例①：戦略×役割の整理 -->
                 <div class="prompt-card">
@@ -954,8 +932,22 @@
                     <div class="prompt-body" id="prompt-s1-qa-3">2つの資料から、NTTファイナンスの今後のビジネス機会と事業リスクを3点ずつ短く提案して。</div>
                 </div>
 
-                <h3><span class="material-icons">headphones</span> Step 1-4：音声解説とスライド資料の確認</h3>
-                <p>右側 Studio パネルの下部に <strong>音声解説</strong> と <strong>スライド資料</strong> が完成したら、クリックして日本語対談番組の試聴やスライドの閲覧を行います。</p>
+                <h3><span class="material-icons">auto_awesome</span> Step 1-3：音声解説とスライド資料の生成</h3>
+                <p>チャットでのQAを体験したら、画面右側の <strong>Studio パネル</strong> から、<strong>① 音声解説</strong> → <strong>② スライド資料</strong> の順に生成を開始します。</p>
+                <div class="screenshot-card" style="max-width: 420px; margin: 12px 0 24px;">
+                    <img src="./images/studio_panel.png" alt="Studio パネル：① 音声解説、② スライド資料">
+                </div>
+
+                <h4>① 音声解説の生成</h4>
+                <p><strong>「音声解説」（図①）</strong> をクリックすると「音声解説をカスタマイズ」のポップアップが表示されます。<strong>言語</strong>が <strong>「日本語」</strong> になっていることを確認し、<strong>長さ</strong>で <strong>「短め」</strong> を選択して <strong>［生成］</strong> をクリックします（下の入力欄は空欄のままで構いません）。</p>
+
+                <h4>② スライド資料の生成</h4>
+                <p>続けて <strong>「スライド資料」（図②）</strong> をクリックします。カスタマイズなしでそのまま自動生成が始まります。</p>
+                <div class="tip">
+                    <strong>⏱ 生成時間の目安と進め方：</strong><br>
+                    スライド資料は約5分、音声解説は5〜10分かかります。生成を待っている間に、<strong>下のボタンから「シナリオ2」以降を先に進めてください</strong>。<br>
+                    生成が完了したら Gemini Notebook の画面に戻り、右側 Studio パネルの下部から日本語対談番組の試聴やスライド資料の閲覧を行います。
+                </div>
 
                 <div class="nav-buttons">
                     <button class="btn btn-prev" onclick="showStep(0)">
